@@ -93,6 +93,12 @@ body {
     font-weight: 700;
 }
 
+.user-label {
+    color: #42606a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
 .signup-button {
     background: linear-gradient(135deg, #20b7bd, #76d8c7);
     color: #ffffff;
@@ -205,6 +211,153 @@ body {
     .nav-menu {
         border-radius: 16px;
     }
+}
+
+.message-stack {
+    left: 50%;
+    max-width: min(92%, 680px);
+    position: fixed;
+    top: 92px;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 90;
+}
+
+.message {
+    background: rgba(255, 252, 244, 0.96);
+    border: 1px solid #d7eee9;
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(46, 134, 149, 0.16);
+    color: #24404a;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding: 12px 16px;
+    text-align: center;
+}
+
+.message.success {
+    border-color: #76d8c7;
+}
+
+.auth-page {
+    align-items: center;
+    background:
+        linear-gradient(rgba(255, 248, 232, 0.56), rgba(232, 249, 245, 0.94)),
+        url("../images/Island Picture 2.jpeg"),
+        linear-gradient(135deg, #f9c9b6 0%, #c9ecf5 44%, #e8f8e8 100%);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 130px 18px 70px;
+}
+
+.auth-card {
+    background: rgba(255, 252, 244, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 24px;
+    box-shadow: 0 24px 58px rgba(46, 134, 149, 0.2);
+    max-width: 460px;
+    padding: clamp(24px, 4vw, 38px);
+    width: 100%;
+}
+
+.auth-kicker {
+    color: #0b7183;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+}
+
+.auth-card h1 {
+    color: #173f4a;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(32px, 5vw, 44px);
+    font-weight: 500;
+    line-height: 1.05;
+    margin: 0;
+}
+
+.auth-copy,
+.auth-switch {
+    color: #58717a;
+}
+
+.auth-copy {
+    margin: 14px 0 24px;
+}
+
+.auth-form {
+    display: grid;
+    gap: 10px;
+}
+
+.auth-form label {
+    color: #24404a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.auth-form input {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #cfe7e4;
+    border-radius: 12px;
+    color: #24404a;
+    font: inherit;
+    min-height: 46px;
+    outline: none;
+    padding: 10px 13px;
+    width: 100%;
+}
+
+.auth-form input:focus {
+    border-color: #20b7bd;
+    box-shadow: 0 0 0 4px rgba(32, 183, 189, 0.14);
+}
+
+.auth-submit {
+    background: linear-gradient(135deg, #20b7bd, #76d8c7);
+    border: 0;
+    border-radius: 999px;
+    color: #ffffff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 800;
+    margin-top: 10px;
+    min-height: 48px;
+    padding: 12px 20px;
+}
+
+.auth-submit:hover {
+    background: linear-gradient(135deg, #f4a7a1, #f8c983);
+}
+
+.auth-switch {
+    margin: 20px 0 0;
+    text-align: center;
+}
+
+.auth-switch a {
+    color: #0b7183;
+    font-weight: 800;
+}
+
+.form-alert,
+.auth-form .errorlist {
+    background: rgba(244, 167, 161, 0.16);
+    border: 1px solid rgba(244, 167, 161, 0.48);
+    border-radius: 12px;
+    color: #8c3d38;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px 12px;
+}
+
+.auth-form .errorlist {
+    list-style: none;
 }
 
 .home-hero {

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card">
+        <p class="auth-kicker">Welcome back</p>
+        <h1>Login to Maavaharu</h1>
+        <p class="auth-copy">Continue planning your island stay, ferry rides, and activities.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+
+            <button type="submit" class="auth-submit">Login</button>
+        </form>
+
+        <p class="auth-switch">
+            New to Maavaharu?
+            <a href="{% url 'signup' %}">Create an account</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
