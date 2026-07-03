@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="home-hero">
+    <div class="hero-inner">
+        <p class="hero-kicker">Maldives-inspired island booking</p>
+        <h1>Plan Your Maavaharu Escape</h1>
+        <p>
+            Book hotel stays, ferry rides, theme park activities, and beach events
+            in one peaceful island system.
+        </p>
+        <div class="hero-buttons">
+            <a href="#" class="hero-primary">Book Your Stay</a>
+            <a href="#" class="hero-secondary">Explore Activities</a>
+        </div>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Staff-managed content</p>
+        <h2>Promotions</h2>
+    </div>
+
+    <div class="card-grid">
+        {% for ad in advertisements %}
+            <article class="island-card promo-card">
+                {% if ad.image_url %}
+                    <img src="{{ ad.image_url }}" alt="{{ ad.title }}">
+                {% endif %}
+                <h3>{{ ad.title }}</h3>
+                <p>{{ ad.content|default:"A new Maavaharu offer is available." }}</p>
+            </article>
+        {% empty %}
+            <article class="island-card promo-card">
+                <h3>No advertisements yet</h3>
+                <p>Add active advertisements from the admin panel and they will appear here.</p>
+            </article>
+        {% endfor %}
+
+        {% for promotion in promotions %}
+            <article class="island-card promo-card">
+                <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                <h3>{{ promotion.title }}</h3>
+                <p>{{ promotion.description|default:"Hotel promotion available for Maavaharu visitors." }}</p>
+                <small>Valid until {{ promotion.valid_until }}</small>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Visitor services</p>
+        <h2>Book Your Island Journey</h2>
+    </div>
+
+    <div class="service-grid">
+        <article class="service-card">
+            <h3>Hotel Stays</h3>
+            <p>Reserve island-view rooms and family stays before your trip.</p>
+            <a href="#">View Hotels</a>
+        </article>
+        <article class="service-card">
+            <h3>Ferry Rides</h3>
+            <p>Travel across the lagoon after confirming your hotel booking.</p>
+            <a href="#">View Ferry</a>
+        </article>
+        <article class="service-card">
+            <h3>Theme Park</h3>
+            <p>Book rides, shows, and activity tickets for selected dates.</p>
+            <a href="#">View Activities</a>
+        </article>
+        <article class="service-card">
+            <h3>Beach Events</h3>
+            <p>Join beach games, sunset events, and outdoor island activities.</p>
+            <a href="#">View Events</a>
+        </article>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Managed by hotel staff</p>
+        <h2>Featured Hotels</h2>
+    </div>
+
+    <div class="card-grid">
+        {% for hotel in hotels %}
+            <article class="island-card">
+                <span class="soft-tag">{{ hotel.location }}</span>
+                <h3>{{ hotel.name }}</h3>
+                <p>{{ hotel.description|default:"A comfortable stay close to Maavaharu island activities." }}</p>
+                <a href="#">Book hotel</a>
+            </article>
+        {% empty %}
+            <article class="island-card">
+                <h3>No hotels added yet</h3>
+                <p>Hotel staff can add hotels and rooms from the admin panel.</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Managed by theme park staff</p>
+        <h2>Upcoming Activities</h2>
+    </div>
+
+    <div class="activity-list">
+        {% for event in events %}
+            <article class="activity-row">
+                <div>
+                    <span class="soft-tag">{{ event.get_event_type_display }}</span>
+                    <h3>{{ event.name }}</h3>
+                    <p>{{ event.description|default:"Book tickets before available capacity runs out." }}</p>
+                </div>
+                <div class="activity-meta">
+                    <strong>{{ event.date }}</strong>
+                    <span>{{ event.time }}</span>
+                    <span>Rs {{ event.price }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="activity-row">
+                <div>
+                    <h3>No activities added yet</h3>
+                    <p>Theme park staff can add rides, shows, and beach events from the admin panel.</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="home-section map-section">
+    <div>
+        <div class="section-title">
+            <p>Managed by admin</p>
+            <h2>Explore Maavaharu</h2>
+        </div>
+        <p class="map-copy">
+            Show hotels, ferry docks, beach areas, theme park gates, and visitor points
+            from dynamic map location records.
+        </p>
+        <a href="#" class="hero-secondary">Open Island Map</a>
+    </div>
+
+    <div class="location-list">
+        {% for location in locations %}
+            <article>
+                <strong>{{ location.name }}</strong>
+                <span>{{ location.category|default:"Island location" }}</span>
+            </article>
+        {% empty %}
+            <article>
+                <strong>No locations added yet</strong>
+                <span>Admin can add map locations from the admin panel.</span>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

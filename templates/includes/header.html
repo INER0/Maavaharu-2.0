@@ -1,0 +1,29 @@
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" href="{% url 'home' %}">
+            Maavaharu
+        </a>
+
+        <input class="menu-toggle" type="checkbox" id="main-menu">
+        <label class="menu-button" for="main-menu" aria-label="Open navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
+
+        <div class="nav-menu">
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#">Hotels</a>
+                <a href="#">Ferry</a>
+                <a href="#">Theme Park</a>
+                <a href="#">Map</a>
+            </div>
+
+            <div class="nav-actions">
+                <a class="login-link" href="#">Login</a>
+                <a class="signup-button" href="#">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+</header>
