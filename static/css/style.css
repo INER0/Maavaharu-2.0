@@ -210,8 +210,11 @@ body {
 .home-hero {
     align-items: center;
     background:
-        linear-gradient(rgba(255, 248, 232, 0.2), rgba(232, 249, 245, 0.94)),
+        linear-gradient(rgba(255, 248, 232, 0.28), rgba(232, 249, 245, 0.9)),
+        url("../images/Island Picture 1.jpeg"),
         linear-gradient(135deg, #f9c9b6 0%, #c9ecf5 44%, #e8f8e8 100%);
+    background-position: center;
+    background-size: cover;
     display: flex;
     min-height: 100vh;
     padding: 130px 24px 90px;
