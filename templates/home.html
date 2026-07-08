@@ -5,15 +5,15 @@
 {% block content %}
 <section class="home-hero">
     <div class="hero-inner">
-        <p class="hero-kicker">Maldives-inspired island booking</p>
+        <p class="hero-kicker">Maavaharu hotel and island booking</p>
         <h1>Plan Your Maavaharu Escape</h1>
         <p>
-            Book hotel stays, ferry rides, theme park activities, and beach events
-            in one peaceful island system.
+            Stay at Maavaharu Hotel on the island near Picnic Island, then book
+            ferry rides, theme park visits, and beach activities nearby.
         </p>
         <div class="hero-buttons">
-            <a href="#" class="hero-primary">Book Your Stay</a>
-            <a href="#" class="hero-secondary">Explore Activities</a>
+            <a href="{% url 'hotel_booking' %}" class="hero-primary">Book Your Stay</a>
+            <a href="{% url 'themepark' %}" class="hero-secondary">Explore Activities</a>
         </div>
     </div>
 </section>
@@ -59,24 +59,24 @@
 
     <div class="service-grid">
         <article class="service-card">
-            <h3>Hotel Stays</h3>
-            <p>Reserve island-view rooms and family stays before your trip.</p>
-            <a href="#">View Hotels</a>
+            <h3>Maavaharu Hotel</h3>
+            <p>Reserve rooms at the island hotel before visiting Picnic Island and nearby attractions.</p>
+            <a href="{% url 'hotel_booking' %}">View Rooms</a>
         </article>
         <article class="service-card">
             <h3>Ferry Rides</h3>
             <p>Travel across the lagoon after confirming your hotel booking.</p>
-            <a href="#">View Ferry</a>
+            <a href="{% url 'ferry' %}">View Ferry</a>
         </article>
         <article class="service-card">
             <h3>Theme Park</h3>
-            <p>Book rides, shows, and activity tickets for selected dates.</p>
-            <a href="#">View Activities</a>
+            <p>Book rides, shows, and activity tickets for the planned theme park island.</p>
+            <a href="{% url 'themepark' %}">View Activities</a>
         </article>
         <article class="service-card">
             <h3>Beach Events</h3>
             <p>Join beach games, sunset events, and outdoor island activities.</p>
-            <a href="#">View Events</a>
+            <a href="{% url 'themepark' %}">View Events</a>
         </article>
     </div>
 </section>
@@ -84,7 +84,7 @@
 <section class="home-section">
     <div class="section-title">
         <p>Managed by hotel staff</p>
-        <h2>Featured Hotels</h2>
+        <h2>Maavaharu Hotel</h2>
     </div>
 
     <div class="card-grid">
@@ -92,13 +92,13 @@
             <article class="island-card">
                 <span class="soft-tag">{{ hotel.location }}</span>
                 <h3>{{ hotel.name }}</h3>
-                <p>{{ hotel.description|default:"A comfortable stay close to Maavaharu island activities." }}</p>
-                <a href="#">Book hotel</a>
+                <p>{{ hotel.description|default:"A comfortable island stay near Picnic Island and the planned theme park." }}</p>
+                <a href="{% url 'hotel_booking' %}">Book a room</a>
             </article>
         {% empty %}
             <article class="island-card">
-                <h3>No hotels added yet</h3>
-                <p>Hotel staff can add hotels and rooms from the admin panel.</p>
+                <h3>Maavaharu Hotel details not added yet</h3>
+                <p>Hotel staff can add Maavaharu Hotel rooms and details from the admin panel.</p>
             </article>
         {% endfor %}
     </div>
@@ -128,7 +128,7 @@
             <article class="activity-row">
                 <div>
                     <h3>No activities added yet</h3>
-                    <p>Theme park staff can add rides, shows, and beach events from the admin panel.</p>
+                    <p>Theme park staff can add rides, shows, and beach events for the nearby theme park island.</p>
                 </div>
             </article>
         {% endfor %}
@@ -142,8 +142,8 @@
             <h2>Explore Maavaharu</h2>
         </div>
         <p class="map-copy">
-            Show hotels, ferry docks, beach areas, theme park gates, and visitor points
-            from dynamic map location records.
+            Show Maavaharu Hotel, ferry docks, Picnic Island areas, theme park gates,
+            and visitor points from dynamic map location records.
         </p>
         <a href="#" class="hero-secondary">Open Island Map</a>
     </div>

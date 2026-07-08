@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Theme Park | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="park-hero">
+    <div>
+        <p class="hero-kicker">Nearby theme park island</p>
+        <h1>Maavaharu Theme Park</h1>
+        <p>
+            Discover rides, shows, beach events, and island activities inspired by
+            Maldivian lagoon life, coral colors, dhoni journeys, and sunset gatherings.
+        </p>
+    </div>
+</section>
+
+<section class="park-date-strip">
+    <div class="section-title">
+        <p>Available dates</p>
+        <h2>Plan By Date</h2>
+    </div>
+    <div class="date-pill-list">
+        {% for date in upcoming_dates %}
+            <span>{{ date }}</span>
+        {% empty %}
+            <span>No event dates added yet</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="park-layout">
+    <div class="park-main">
+        <div class="section-title booking-title">
+            <p>Activity and event booking</p>
+            <h2>Rides And Shows</h2>
+        </div>
+
+        <div class="park-card-grid">
+            {% for event in activities %}
+                <article class="park-event-card">
+                    <span class="soft-tag">{{ event.get_event_type_display }}</span>
+                    <h3>{{ event.name }}</h3>
+                    <p>{{ event.description|default:"Enjoy a scheduled island activity on the nearby theme park island." }}</p>
+                    <div class="park-event-meta">
+                        <span>{{ event.date }}</span>
+                        <span>{{ event.time }}</span>
+                        <span>Rs {{ event.price }}</span>
+                        <span>{{ event.available_capacity }} spots left</span>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="park-event-card">
+                    <h3>No rides or shows added yet</h3>
+                    <p>Theme park staff can add activities from the admin panel.</p>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+
+    <aside class="park-ticket-panel">
+        <h2>Purchase Activity Ticket</h2>
+        <p>Select an available ride or show and purchase online.</p>
+        <form method="post" class="booking-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_kind" value="activity">
+
+            {% if activity_form.non_field_errors %}
+                <div class="form-alert">{{ activity_form.non_field_errors }}</div>
+            {% endif %}
+
+            <label for="{{ activity_form.event.id_for_label }}">Activity or show</label>
+            {{ activity_form.event }}
+            {{ activity_form.event.errors }}
+
+            <label for="{{ activity_form.quantity.id_for_label }}">Tickets</label>
+            {{ activity_form.quantity }}
+            {{ activity_form.quantity.errors }}
+
+            <button type="submit" class="booking-submit">Purchase Ticket</button>
+        </form>
+    </aside>
+</section>
+
+<section class="beach-event-section">
+    <div class="beach-event-copy">
+        <p class="hero-kicker">Beach events booking</p>
+        <h2>Sunset Beach Experiences</h2>
+        <p>
+            Join beach games, cultural evening activities, lagoon-side gatherings,
+            and relaxed outdoor events designed for visitors coming from Picnic Island
+            and Maavaharu Hotel.
+        </p>
+    </div>
+
+    <div class="beach-event-content">
+        <div class="park-card-grid">
+            {% for event in beach_events %}
+                <article class="park-event-card beach-card">
+                    <span class="soft-tag">{{ event.get_event_type_display }}</span>
+                    <h3>{{ event.name }}</h3>
+                    <p>{{ event.description|default:"A beach event with Maldivian island atmosphere and visitor-friendly activities." }}</p>
+                    <div class="park-event-meta">
+                        <span>{{ event.date }}</span>
+                        <span>{{ event.time }}</span>
+                        <span>Rs {{ event.price }}</span>
+                        <span>{{ event.available_capacity }} spots left</span>
+                    </div>
+                </article>
+            {% empty %}
+                <article class="park-event-card beach-card">
+                    <h3>No beach events added yet</h3>
+                    <p>Theme park staff can add beach events from the admin panel.</p>
+                </article>
+            {% endfor %}
+        </div>
+
+        <aside class="park-ticket-panel beach-ticket-panel">
+            <h2>Book Beach Event</h2>
+            <p>Select a beach event and reserve tickets online.</p>
+            <form method="post" class="booking-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_kind" value="beach">
+
+                {% if beach_form.non_field_errors %}
+                    <div class="form-alert">{{ beach_form.non_field_errors }}</div>
+                {% endif %}
+
+                <label for="{{ beach_form.event.id_for_label }}">Beach event</label>
+                {{ beach_form.event }}
+                {{ beach_form.event.errors }}
+
+                <label for="{{ beach_form.quantity.id_for_label }}">Tickets</label>
+                {{ beach_form.quantity }}
+                {{ beach_form.quantity.errors }}
+
+                <button type="submit" class="booking-submit">Book Beach Event</button>
+            </form>
+        </aside>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Your tickets</p>
+        <h2>Recent Purchases</h2>
+    </div>
+
+    <div class="activity-list">
+        {% for ticket in user_tickets %}
+            <article class="activity-row">
+                <div>
+                    <span class="soft-tag">{{ ticket.event.get_event_type_display }}</span>
+                    <h3>{{ ticket.event.name }}</h3>
+                    <p>{{ ticket.quantity }} ticket(s), purchased {{ ticket.purchased_at|date:"M d, Y" }}</p>
+                </div>
+                <div class="activity-meta">
+                    <strong>{{ ticket.event.date }}</strong>
+                    <span>{{ ticket.event.time }}</span>
+                    <span>{{ ticket.channel|title }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="activity-row">
+                <div>
+                    <h3>No ticket purchases yet</h3>
+                    <p>Your activity and beach event tickets will appear here after login and purchase.</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

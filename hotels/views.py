@@ -1,12 +1,45 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from accounts.models import User
 from accounts.permissions import ReadOnlyOrStaff
+from .forms import HotelBookingForm
 from .models import Hotel, Room, HotelBooking, HotelPromotion
 from .serializers import (
     HotelSerializer, RoomSerializer, HotelBookingSerializer, HotelPromotionSerializer,
 )
+
+
+@login_required(login_url='login')
+def hotel_booking_page(request):
+    hotel = Hotel.objects.prefetch_related('rooms').first()
+    rooms = Room.objects.select_related('hotel').all()
+    promotions = HotelPromotion.objects.select_related('hotel').order_by('valid_until')[:3]
+    user_bookings = HotelBooking.objects.filter(visitor=request.user).select_related(
+        'room', 'room__hotel'
+    ).order_by('-created_at')[:5]
+
+    if request.method == 'POST':
+        form = HotelBookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.visitor = request.user
+            booking.save()
+            messages.success(request, 'Your Maavaharu room booking request has been created.')
+            return redirect('hotel_booking')
+    else:
+        form = HotelBookingForm()
+
+    return render(request, 'hotels/booking.html', {
+        'form': form,
+        'hotel': hotel,
+        'rooms': rooms,
+        'promotions': promotions,
+        'user_bookings': user_bookings,
+    })
 
 
 class HotelViewSet(viewsets.ModelViewSet):

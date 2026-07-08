@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}My Account | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="account-hero">
+    <div>
+        <p class="hero-kicker">Visitor account</p>
+        <h1>My Maavaharu Dashboard</h1>
+        <p>
+            View your Maavaharu Hotel bookings, theme park tickets, and beach
+            event bookings in one place.
+        </p>
+    </div>
+</section>
+
+<section class="account-summary">
+    <article>
+        <span>{{ hotel_bookings|length }}</span>
+        <p>Hotel bookings</p>
+    </article>
+    <article>
+        <span>{{ themepark_tickets|length }}</span>
+        <p>Theme park tickets</p>
+    </article>
+</section>
+
+<section class="account-section">
+    <div class="section-title booking-title">
+        <p>Maavaharu Hotel</p>
+        <h2>My Room Bookings</h2>
+    </div>
+
+    <div class="account-list">
+        {% for booking in hotel_bookings %}
+            <article class="account-row">
+                <div>
+                    <span class="soft-tag">{{ booking.get_status_display }}</span>
+                    <h3>{{ booking.room }}</h3>
+                    <p>{{ booking.num_rooms }} room(s), {{ booking.check_in }} to {{ booking.check_out }}</p>
+                </div>
+                <div class="account-meta">
+                    <strong>{{ booking.created_at|date:"M d, Y" }}</strong>
+                    <span>Booking request</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="account-row">
+                <div>
+                    <h3>No hotel bookings yet</h3>
+                    <p>Your Maavaharu Hotel room booking requests will appear here.</p>
+                </div>
+                <a class="account-action" href="{% url 'hotel_booking' %}">Book a room</a>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="account-section">
+    <div class="section-title booking-title">
+        <p>Theme park and beach events</p>
+        <h2>My Activity Tickets</h2>
+    </div>
+
+    <div class="account-list">
+        {% for ticket in themepark_tickets %}
+            <article class="account-row">
+                <div>
+                    <span class="soft-tag">{{ ticket.event.get_event_type_display }}</span>
+                    <h3>{{ ticket.event.name }}</h3>
+                    <p>{{ ticket.quantity }} ticket(s), {{ ticket.event.date }} at {{ ticket.event.time }}</p>
+                </div>
+                <div class="account-meta">
+                    <strong>{{ ticket.purchased_at|date:"M d, Y" }}</strong>
+                    <span>{{ ticket.channel|title }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="account-row">
+                <div>
+                    <h3>No activity tickets yet</h3>
+                    <p>Your ride, show, and beach event tickets will appear here.</p>
+                </div>
+                <a class="account-action" href="{% url 'themepark' %}">Explore events</a>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

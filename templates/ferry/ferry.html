@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Ferry Transfer | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="ferry-hero">
+    <div>
+        <p class="hero-kicker">Lagoon transfer</p>
+        <h1>Ferry To Maavaharu</h1>
+        <p>
+            View ferry schedules between Picnic Island, Maavaharu Hotel, and the
+            nearby theme park island. Transfers are free for visitors with a valid
+            Maavaharu Hotel booking.
+        </p>
+    </div>
+</section>
+
+<section class="ferry-info-strip">
+    <article>
+        <span class="soft-tag">Free transfer</span>
+        <h2>Included With Hotel Booking</h2>
+        <p>
+            Guests with a confirmed Maavaharu Hotel booking can use the ferry
+            transfer without an extra ticket payment.
+        </p>
+    </article>
+    <article>
+        <span class="soft-tag">Route</span>
+        <h2>Picnic Island To Maavaharu</h2>
+        <p>
+            The ferry connects the existing picnic destination, Maavaharu Hotel,
+            and the planned nearby theme park island.
+        </p>
+    </article>
+    <article>
+        <span class="soft-tag">Staff managed</span>
+        <h2>Live Schedule Data</h2>
+        <p>
+            Ferry operators can update schedules, capacity, and seat availability
+            from the staff/admin side.
+        </p>
+    </article>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Managed by ferry staff</p>
+        <h2>Ferry Schedule</h2>
+    </div>
+
+    <div class="schedule-list">
+        {% for schedule in schedules %}
+            <article class="schedule-row">
+                <div>
+                    <span class="soft-tag">{{ schedule.date }}</span>
+                    <h3>{{ schedule.origin }} to {{ schedule.destination }}</h3>
+                    <p>Departure time: {{ schedule.departure_time }}</p>
+                </div>
+                <div class="schedule-meta">
+                    <strong>{{ schedule.available_seats }} seats left</strong>
+                    <span>Capacity {{ schedule.capacity }}</span>
+                    <span>Free with valid booking</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="schedule-row">
+                <div>
+                    <h3>No ferry schedules added yet</h3>
+                    <p>Ferry staff can add transfer schedules from the admin panel.</p>
+                </div>
+                <div class="schedule-meta">
+                    <strong>Coming soon</strong>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="ferry-details">
+    <div>
+        <p class="hero-kicker">Before boarding</p>
+        <h2>Transfer Details</h2>
+        <ul>
+            <li>Bring your confirmed Maavaharu Hotel booking details.</li>
+            <li>Arrive at the ferry dock before departure time.</li>
+            <li>Seats depend on ferry capacity and schedule availability.</li>
+            <li>Ferry staff can validate eligible guests before boarding.</li>
+        </ul>
+    </div>
+    <div class="ferry-note">
+        <h3>Need a booking first?</h3>
+        <p>
+            Reserve your Maavaharu Hotel stay before planning the ferry transfer.
+            Free transfer is connected to confirmed hotel bookings.
+        </p>
+        <a href="{% url 'hotel_booking' %}" class="hero-primary">Book Maavaharu Hotel</a>
+    </div>
+</section>
+{% endblock %}

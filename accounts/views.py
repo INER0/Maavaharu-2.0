@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render
 from rest_framework import generics, viewsets, status
@@ -12,6 +13,21 @@ from .forms import VisitorSignUpForm
 from .models import User
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from .permissions import IsAdmin
+
+
+@login_required(login_url='login')
+def account_page(request):
+    hotel_bookings = request.user.hotel_bookings.select_related(
+        'room', 'room__hotel'
+    ).order_by('-created_at')
+    themepark_tickets = request.user.themepark_tickets.select_related(
+        'event'
+    ).order_by('-purchased_at')
+
+    return render(request, 'accounts/account.html', {
+        'hotel_bookings': hotel_bookings,
+        'themepark_tickets': themepark_tickets,
+    })
 
 
 def signup_page(request):

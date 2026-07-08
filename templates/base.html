@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Maavaharu Booking System{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260708">
 </head>
 <body>
 
@@ -24,6 +24,8 @@
         {% block content %}
         {% endblock %}
     </main>
+
+    {% include 'includes/footer.html' %}
 
 </body>
 </html>

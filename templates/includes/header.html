@@ -14,15 +14,15 @@
         <div class="nav-menu">
             <div class="nav-links">
                 <a href="{% url 'home' %}">Home</a>
-                <a href="#">Hotels</a>
-                <a href="#">Ferry</a>
-                <a href="#">Theme Park</a>
+                <a href="{% url 'hotel_booking' %}">Maavaharu Hotel</a>
+                <a href="{% url 'ferry' %}">Ferry</a>
+                <a href="{% url 'themepark' %}">Theme Park</a>
                 <a href="#">Map</a>
             </div>
 
             <div class="nav-actions">
                 {% if user.is_authenticated %}
-                    <span class="user-label">{{ user.username }}</span>
+                    <a class="user-label" href="{% url 'account' %}">{{ user.username }}</a>
                     <a class="signup-button" href="{% url 'logout' %}">Logout</a>
                 {% else %}
                     <a class="signup-button" href="{% url 'login' %}">Login</a>
