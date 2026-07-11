@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Island Map | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="map-hero-page">
+    <div>
+        <p class="hero-kicker">Island locations</p>
+        <h1>Explore Maavaharu And Nearby Islands</h1>
+        <p>
+            View key visitor locations including Maavaharu Hotel, ferry docks,
+            Picnic Island areas, beach activity zones, and the planned theme park island.
+        </p>
+    </div>
+</section>
+
+<section class="interactive-map-section">
+    <div class="island-map-visual">
+        <div class="map-water-ring"></div>
+        <div class="map-island-shape">
+            <span class="map-pin hotel-pin">Hotel</span>
+            <span class="map-pin ferry-pin">Ferry</span>
+            <span class="map-pin beach-pin">Beach</span>
+            <span class="map-pin park-pin">Park</span>
+        </div>
+    </div>
+
+    <div class="map-guide-panel">
+        <p class="hero-kicker">How to read this map</p>
+        <h2>Visitor Guide</h2>
+        <p>
+            Admin can maintain official map locations from the admin panel.
+            Visitors can use this page to understand where services and attractions are placed.
+        </p>
+        <div class="map-legend">
+            <span><i class="legend-dot hotel"></i> Hotel</span>
+            <span><i class="legend-dot ferry"></i> Ferry dock</span>
+            <span><i class="legend-dot beach"></i> Beach area</span>
+            <span><i class="legend-dot park"></i> Theme park</span>
+        </div>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="section-title">
+        <p>Managed by admin</p>
+        <h2>Map Locations</h2>
+    </div>
+
+    <div class="location-card-grid">
+        {% for location in locations %}
+            <article class="map-location-card">
+                <span class="soft-tag">{{ location.category|default:"Island location" }}</span>
+                <h3>{{ location.name }}</h3>
+                <p>{{ location.description|default:"Location details can be updated by admin." }}</p>
+                <div class="coordinate-row">
+                    <span>Lat {{ location.latitude }}</span>
+                    <span>Lng {{ location.longitude }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="map-location-card">
+                <h3>No map locations added yet</h3>
+                <p>Admin can add Maavaharu Hotel, ferry docks, beaches, theme park gates, and visitor points from the admin panel.</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

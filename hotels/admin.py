@@ -1,10 +1,20 @@
 from django.contrib import admin
 
-from .models import Hotel, HotelBooking, HotelPromotion, Room
+from .models import Hotel, HotelBooking, HotelPromotion, HotelPromotionImage, Room, RoomImage
 
 
 class RoomInline(admin.TabularInline):
     model = Room
+    extra = 1
+
+
+class RoomImageInline(admin.TabularInline):
+    model = RoomImage
+    extra = 1
+
+
+class HotelPromotionImageInline(admin.TabularInline):
+    model = HotelPromotionImage
     extra = 1
 
 
@@ -20,6 +30,7 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = ('hotel', 'room_type', 'price_per_night', 'total_rooms')
     list_filter = ('room_type', 'hotel')
     search_fields = ('hotel__name', 'room_type')
+    inlines = [RoomImageInline]
 
 
 @admin.register(HotelBooking)
@@ -34,3 +45,4 @@ class HotelPromotionAdmin(admin.ModelAdmin):
     list_display = ('title', 'hotel', 'discount_percent', 'valid_until')
     list_filter = ('hotel', 'valid_until')
     search_fields = ('title', 'description', 'hotel__name')
+    inlines = [HotelPromotionImageInline]

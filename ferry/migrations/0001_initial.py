@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('departure_time', models.TimeField()),
                 ('capacity', models.PositiveIntegerField(default=50)),
                 ('available_seats', models.PositiveIntegerField(default=50)),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('price', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
             ],
         ),
     ]

@@ -12,8 +12,8 @@ from .serializers import AdvertisementSerializer, MapLocationSerializer
 
 def home(request):
     advertisements = Advertisement.objects.filter(is_active=True).order_by('-created_at')[:3]
-    promotions = HotelPromotion.objects.all().order_by('valid_until')[:3]
-    hotels = Hotel.objects.prefetch_related('rooms').all()[:3]
+    promotions = HotelPromotion.objects.prefetch_related('images').all().order_by('valid_until')[:3]
+    hotels = Hotel.objects.prefetch_related('rooms__images').all()[:3]
     events = Event.objects.all().order_by('date', 'time')[:4]
     locations = MapLocation.objects.all()[:5]
 
@@ -22,6 +22,14 @@ def home(request):
         'promotions': promotions,
         'hotels': hotels,
         'events': events,
+        'locations': locations,
+    })
+
+
+def island_map_page(request):
+    locations = MapLocation.objects.all().order_by('category', 'name')
+
+    return render(request, 'core/map.html', {
         'locations': locations,
     })
 

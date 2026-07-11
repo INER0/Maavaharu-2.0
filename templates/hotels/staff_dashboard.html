@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hotel Staff | Maavaharu{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260708">
+{% endblock %}
+
+{% block content %}
+<section class="staff-hero">
+    <div>
+        <p class="hero-kicker">Hotel manager dashboard</p>
+        <h1>Maavaharu Hotel Staff</h1>
+        <p>
+            Manage Maavaharu Hotel details, room availability, visitor bookings,
+            promotions, and simple booking reports.
+        </p>
+    </div>
+</section>
+
+<section class="staff-summary">
+    <article>
+        <span>{{ total_rooms }}</span>
+        <p>Total rooms</p>
+    </article>
+    <article>
+        <span>{{ pending_count }}</span>
+        <p>Pending bookings</p>
+    </article>
+    <article>
+        <span>{{ confirmed_count }}</span>
+        <p>Confirmed bookings</p>
+    </article>
+    <article>
+        <span>{{ cancelled_count }}</span>
+        <p>Cancelled bookings</p>
+    </article>
+</section>
+
+<section class="staff-grid">
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Hotel CRUD</p>
+            <h2>Hotel Details</h2>
+        </div>
+        <form method="post" class="staff-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_hotel">
+            {{ hotel_form.as_p }}
+            <button type="submit" class="booking-submit">Save Hotel Details</button>
+        </form>
+    </article>
+
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Room availability</p>
+            <h2>Add Room Type</h2>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="staff-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_room">
+            {{ room_form.as_p }}
+            <button type="submit" class="booking-submit">Add Room</button>
+        </form>
+    </article>
+</section>
+
+<section class="staff-section">
+    <div class="section-title booking-title">
+        <p>Room management</p>
+        <h2>Current Room Availability</h2>
+    </div>
+
+    <div class="staff-card-grid">
+        {% for room in rooms %}
+            <article class="staff-card">
+                <p class="staff-preview-label">Website preview</p>
+                <div class="staff-site-preview">
+                    {% if room.images.all %}
+                        <div class="staff-thumb-row">
+                            {% for image in room.images.all %}
+                                <img src="{{ image.image.url }}" alt="{{ room.room_type }}">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <span class="soft-tag">{{ room.hotel.name }}</span>
+                    <h3>{{ room.room_type }}</h3>
+                    <p>{{ room.hotel.description|default:"Comfortable island rooms close to Maavaharu services." }}</p>
+                    <div class="staff-preview-meta">
+                        <span>MVR {{ room.price_per_night }} / night</span>
+                        <span>{{ room.total_rooms }} rooms</span>
+                    </div>
+                    <button type="button" disabled>Book this room</button>
+                </div>
+            </article>
+        {% empty %}
+            <article class="staff-card">
+                <h3>No rooms added yet</h3>
+                <p>Add room types using the room availability form.</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="staff-section">
+    <div class="section-title booking-title">
+        <p>Booking management</p>
+        <h2>Visitor Bookings</h2>
+    </div>
+
+    <div class="staff-table-wrap">
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>Visitor</th>
+                    <th>Room</th>
+                    <th>Dates</th>
+                    <th>Guests</th>
+                    <th>Rooms</th>
+                    <th>Details</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.visitor.username }}</td>
+                        <td>{{ booking.room }}</td>
+                        <td>{{ booking.check_in }} to {{ booking.check_out }}</td>
+                        <td>{{ booking.adults }} adult(s), {{ booking.kids }} kid(s)</td>
+                        <td>{{ booking.num_rooms }}</td>
+                        <td>{{ booking.special_requests|default:"-" }}</td>
+                        <td><span class="soft-tag">{{ booking.get_status_display }}</span></td>
+                        <td>
+                            <form method="post" class="inline-status-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_booking">
+                                <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                                <select name="status">
+                                    {% for value, label in booking.Status.choices %}
+                                        <option value="{{ value }}" {% if booking.status == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">No visitor bookings yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="staff-grid">
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Promotions</p>
+            <h2>Add Hotel Offer</h2>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="staff-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_promotion">
+            {{ promotion_form.as_p }}
+            <button type="submit" class="booking-submit">Add Promotion</button>
+        </form>
+    </article>
+
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Reports</p>
+            <h2>Booking Report</h2>
+        </div>
+        <div class="report-list">
+            <p><strong>Total bookings:</strong> {{ bookings|length }}</p>
+            <p><strong>Pending:</strong> {{ pending_count }}</p>
+            <p><strong>Confirmed:</strong> {{ confirmed_count }}</p>
+            <p><strong>Cancelled:</strong> {{ cancelled_count }}</p>
+        </div>
+    </article>
+</section>
+
+<section class="staff-section">
+    <div class="section-title booking-title">
+        <p>Active content</p>
+        <h2>Hotel Promotions</h2>
+    </div>
+
+    <div class="staff-card-grid">
+        {% for promotion in promotions %}
+            <article class="staff-card promotion-card">
+                <p class="staff-preview-label">Website preview</p>
+                <div class="staff-site-preview">
+                    {% if promotion.images.all %}
+                        <div class="staff-thumb-row">
+                            {% for image in promotion.images.all %}
+                                <img src="{{ image.image.url }}" alt="{{ promotion.title }}">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if promotion.discount_percent %}
+                        <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                    {% endif %}
+                    <h3>{{ promotion.title }}</h3>
+                    <p>{{ promotion.description|default:"Promotion for Maavaharu guests." }}</p>
+                    <strong>Valid until {{ promotion.valid_until }}</strong>
+                </div>
+            </article>
+        {% empty %}
+            <article class="staff-card">
+                <h3>No promotions added yet</h3>
+                <p>Add hotel stay offers using the promotion form.</p>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

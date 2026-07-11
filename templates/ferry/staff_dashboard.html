@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ferry Staff | Maavaharu{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260711">
+{% endblock %}
+
+{% block content %}
+<section class="staff-hero">
+    <div>
+        <p class="hero-kicker">Ferry operator dashboard</p>
+        <h1>Maavaharu Ferry Staff</h1>
+        <p>
+            Manage ferry schedules, seat availability, and view guests with
+            confirmed Maavaharu Hotel bookings for boarding validation.
+        </p>
+    </div>
+</section>
+
+<section class="staff-summary">
+    <article>
+        <span>{{ upcoming_count }}</span>
+        <p>Upcoming trips</p>
+    </article>
+    <article>
+        <span>{{ total_capacity }}</span>
+        <p>Total capacity</p>
+    </article>
+    <article>
+        <span>{{ total_available_seats }}</span>
+        <p>Available seats</p>
+    </article>
+    <article>
+        <span>{{ eligible_passenger_count }}</span>
+        <p>Eligible bookings</p>
+    </article>
+</section>
+
+<section class="staff-grid">
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Schedule CRUD</p>
+            <h2>Add Ferry Schedule</h2>
+        </div>
+        <form method="post" class="staff-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_schedule">
+            {{ schedule_form.as_p }}
+            <button type="submit" class="booking-submit">Add Schedule</button>
+        </form>
+    </article>
+
+    <article class="staff-panel">
+        <div class="staff-panel-heading">
+            <p class="hero-kicker">Boarding rule</p>
+            <h2>Free Transfer Access</h2>
+        </div>
+        <div class="report-list">
+            <p><strong>No ferry tickets are sold.</strong></p>
+            <p>Visitors with confirmed Maavaharu Hotel bookings are eligible for ferry transfer.</p>
+            <p>Use the passenger validation list below before boarding.</p>
+        </div>
+    </article>
+</section>
+
+<section class="staff-section">
+    <div class="section-title booking-title">
+        <p>Schedule management</p>
+        <h2>Ferry Schedules</h2>
+    </div>
+
+    <div class="staff-table-wrap">
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Departure</th>
+                    <th>Capacity</th>
+                    <th>Available Seats</th>
+                    <th>Update</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schedule in schedules %}
+                    <tr>
+                        <td>{{ schedule.origin }} to {{ schedule.destination }}</td>
+                        <td>{{ schedule.date }}</td>
+                        <td>{{ schedule.departure_time }}</td>
+                        <td>{{ schedule.capacity }}</td>
+                        <td>{{ schedule.available_seats }}</td>
+                        <td>
+                            <form method="post" class="inline-status-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_seats">
+                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                <input type="number" name="available_seats" value="{{ schedule.available_seats }}" min="0" max="{{ schedule.capacity }}">
+                                <button type="submit">Save</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" class="inline-action-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_schedule">
+                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No ferry schedules added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="staff-section">
+    <div class="section-title booking-title">
+        <p>Passenger validation</p>
+        <h2>Confirmed Hotel Bookings</h2>
+    </div>
+
+    <div class="staff-table-wrap">
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>Visitor</th>
+                    <th>Room</th>
+                    <th>Stay Dates</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in eligible_bookings %}
+                    <tr>
+                        <td>{{ booking.visitor.username }}</td>
+                        <td>{{ booking.room.room_type }}</td>
+                        <td>{{ booking.check_in }} to {{ booking.check_out }}</td>
+                        <td>{{ booking.adults }} adult(s), {{ booking.kids }} kid(s)</td>
+                        <td><span class="soft-tag">{{ booking.get_status_display }}</span></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No confirmed hotel bookings currently eligible for ferry transfer.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

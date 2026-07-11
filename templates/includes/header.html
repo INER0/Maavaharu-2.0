@@ -17,7 +17,13 @@
                 <a href="{% url 'hotel_booking' %}">Maavaharu Hotel</a>
                 <a href="{% url 'ferry' %}">Ferry</a>
                 <a href="{% url 'themepark' %}">Theme Park</a>
-                <a href="#">Map</a>
+                <a href="{% url 'island_map' %}">Map</a>
+                {% if user.is_authenticated and user.role == 'hotel_manager' %}
+                    <a href="{% url 'hotel_staff' %}">Hotel Staff</a>
+                {% endif %}
+                {% if user.is_authenticated and user.role == 'ferry_operator' %}
+                    <a href="{% url 'ferry_staff' %}">Ferry Staff</a>
+                {% endif %}
             </div>
 
             <div class="nav-actions">

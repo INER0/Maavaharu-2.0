@@ -16,6 +16,77 @@
 
 <section class="booking-layout">
     <div class="booking-main">
+        <aside id="booking-panel" class="booking-panel {% if not form.errors %}is-hidden{% endif %}">
+            <h2>Complete Your Booking</h2>
+            <p id="selected-room-display">
+                {% if selected_room %}
+                    Selected room: {{ selected_room.room_type }}
+                {% else %}
+                    Choose a room below to start your booking.
+                {% endif %}
+            </p>
+
+            <form method="post" class="booking-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-alert">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="booking-room-field">
+                    <label for="{{ form.room.id_for_label }}">Room type</label>
+                    {{ form.room }}
+                    {{ form.room.errors }}
+                </div>
+
+                <div class="booking-form-grid">
+                    <div>
+                        <label for="{{ form.check_in.id_for_label }}">Check-in</label>
+                        {{ form.check_in }}
+                        {{ form.check_in.errors }}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.check_out.id_for_label }}">Check-out</label>
+                        {{ form.check_out }}
+                        {{ form.check_out.errors }}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.num_rooms.id_for_label }}">Number of rooms</label>
+                        {{ form.num_rooms }}
+                        {{ form.num_rooms.errors }}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.adults.id_for_label }}">Adults</label>
+                        {{ form.adults }}
+                        {{ form.adults.errors }}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.kids.id_for_label }}">Kids</label>
+                        {{ form.kids }}
+                        {{ form.kids.errors }}
+                    </div>
+                </div>
+
+                <div
+                    id="availability-message"
+                    class="availability-message is-muted"
+                    data-url="{% url 'room_availability' %}"
+                >
+                    Select check-in and check-out dates to see room availability.
+                </div>
+
+                <label for="{{ form.special_requests.id_for_label }}">Any details you would like to share?</label>
+                {{ form.special_requests }}
+                {{ form.special_requests.errors }}
+
+                <button type="submit" class="booking-submit">Submit Booking Request</button>
+            </form>
+        </aside>
+
         <div class="section-title booking-title">
             <p>Available room types</p>
             <h2>Choose Your Room</h2>
@@ -24,13 +95,28 @@
         <div class="room-grid">
             {% for room in rooms %}
                 <article class="room-card">
-                    <span class="soft-tag">{{ room.get_room_type_display }}</span>
-                    <h3>{{ room.hotel.name }}</h3>
+                    {% if room.images.all %}
+                        <div class="room-image-strip">
+                            {% for image in room.images.all %}
+                                <img src="{{ image.image.url }}" alt="{{ room.room_type }}">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <span class="soft-tag">{{ room.hotel.name }}</span>
+                    <h3>{{ room.room_type }}</h3>
                     <p>{{ room.hotel.description|default:"Comfortable island rooms close to Maavaharu services." }}</p>
                     <div class="room-meta">
-                        <span>Rs {{ room.price_per_night }} / night</span>
+                        <span>MVR {{ room.price_per_night }} / night</span>
                         <span>{{ room.total_rooms }} rooms</span>
                     </div>
+                    <button
+                        type="button"
+                        class="room-book-button"
+                        data-room-id="{{ room.id }}"
+                        data-room-name="{{ room.room_type }}"
+                    >
+                        Book this room
+                    </button>
                 </article>
             {% empty %}
                 <article class="room-card">
@@ -48,7 +134,16 @@
             <div class="room-grid">
                 {% for promotion in promotions %}
                     <article class="room-card promotion-card">
-                        <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                        {% if promotion.images.all %}
+                            <div class="room-image-strip">
+                                {% for image in promotion.images.all %}
+                                    <img src="{{ image.image.url }}" alt="{{ promotion.title }}">
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if promotion.discount_percent %}
+                            <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                        {% endif %}
                         <h3>{{ promotion.title }}</h3>
                         <p>{{ promotion.description|default:"Promotion for Maavaharu Hotel guests." }}</p>
                         <small>Valid until {{ promotion.valid_until }}</small>
@@ -57,37 +152,6 @@
             </div>
         {% endif %}
     </div>
-
-    <aside class="booking-panel">
-        <h2>Request Booking</h2>
-        <p>Select your room type and dates. Hotel staff can confirm or manage the booking from admin.</p>
-
-        <form method="post" class="booking-form">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="form-alert">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            <label for="{{ form.room.id_for_label }}">Room type</label>
-            {{ form.room }}
-            {{ form.room.errors }}
-
-            <label for="{{ form.check_in.id_for_label }}">Check-in</label>
-            {{ form.check_in }}
-            {{ form.check_in.errors }}
-
-            <label for="{{ form.check_out.id_for_label }}">Check-out</label>
-            {{ form.check_out }}
-            {{ form.check_out.errors }}
-
-            <label for="{{ form.num_rooms.id_for_label }}">Number of rooms</label>
-            {{ form.num_rooms }}
-            {{ form.num_rooms.errors }}
-
-            <button type="submit" class="booking-submit">Submit Booking Request</button>
-        </form>
-    </aside>
 </section>
 
 <section class="home-section">
@@ -102,7 +166,10 @@
                 <div>
                     <span class="soft-tag">{{ booking.get_status_display }}</span>
                     <h3>{{ booking.room }}</h3>
-                    <p>{{ booking.num_rooms }} room(s), {{ booking.check_in }} to {{ booking.check_out }}</p>
+                    <p>
+                        {{ booking.num_rooms }} room(s), {{ booking.adults }} adult(s),
+                        {{ booking.kids }} kid(s), {{ booking.check_in }} to {{ booking.check_out }}
+                    </p>
                 </div>
                 <div class="activity-meta">
                     <strong>{{ booking.created_at|date:"M d, Y" }}</strong>
@@ -119,4 +186,68 @@
         {% endfor %}
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const bookingPanel = document.querySelector('#booking-panel');
+    const roomSelect = document.querySelector('#id_room');
+    const checkInInput = document.querySelector('#id_check_in');
+    const checkOutInput = document.querySelector('#id_check_out');
+    const numRoomsInput = document.querySelector('#id_num_rooms');
+    const submitButton = document.querySelector('.booking-submit');
+    const availabilityMessage = document.querySelector('#availability-message');
+    const selectedRoomDisplay = document.querySelector('#selected-room-display');
+    const roomButtons = document.querySelectorAll('.room-book-button');
+
+    const setAvailabilityMessage = (text, state) => {
+        availabilityMessage.textContent = text;
+        availabilityMessage.className = `availability-message ${state}`;
+    };
+
+    const checkAvailability = async () => {
+        if (!roomSelect.value || !checkInInput.value || !checkOutInput.value) {
+            setAvailabilityMessage('Select check-in and check-out dates to see room availability.', 'is-muted');
+            submitButton.disabled = false;
+            return;
+        }
+
+        const params = new URLSearchParams({
+            room: roomSelect.value,
+            check_in: checkInInput.value,
+            check_out: checkOutInput.value,
+            num_rooms: numRoomsInput.value || '1',
+        });
+
+        setAvailabilityMessage('Checking room availability...', 'is-muted');
+
+        try {
+            const response = await fetch(`${availabilityMessage.dataset.url}?${params}`);
+            const data = await response.json();
+            setAvailabilityMessage(data.message, data.available ? 'is-available' : 'is-unavailable');
+            submitButton.disabled = !data.available;
+        } catch (error) {
+            setAvailabilityMessage('Could not check availability right now. Try again before submitting.', 'is-muted');
+            submitButton.disabled = false;
+        }
+    };
+
+    roomButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const roomId = button.dataset.roomId;
+            const roomName = button.dataset.roomName;
+
+            roomSelect.value = roomId;
+            selectedRoomDisplay.textContent = `Selected room: ${roomName}`;
+            bookingPanel.classList.remove('is-hidden');
+            checkAvailability();
+            bookingPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    [roomSelect, checkInInput, checkOutInput, numRoomsInput].forEach((input) => {
+        input.addEventListener('change', checkAvailability);
+        input.addEventListener('input', checkAvailability);
+    });
+</script>
 {% endblock %}

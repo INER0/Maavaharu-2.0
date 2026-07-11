@@ -42,7 +42,16 @@
 
         {% for promotion in promotions %}
             <article class="island-card promo-card">
-                <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                {% if promotion.images.all %}
+                    <div class="room-image-strip">
+                        {% for image in promotion.images.all %}
+                            <img src="{{ image.image.url }}" alt="{{ promotion.title }}">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if promotion.discount_percent %}
+                    <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                {% endif %}
                 <h3>{{ promotion.title }}</h3>
                 <p>{{ promotion.description|default:"Hotel promotion available for Maavaharu visitors." }}</p>
                 <small>Valid until {{ promotion.valid_until }}</small>
@@ -121,7 +130,7 @@
                 <div class="activity-meta">
                     <strong>{{ event.date }}</strong>
                     <span>{{ event.time }}</span>
-                    <span>Rs {{ event.price }}</span>
+                    <span>MVR {{ event.price }}</span>
                 </div>
             </article>
         {% empty %}
@@ -145,7 +154,7 @@
             Show Maavaharu Hotel, ferry docks, Picnic Island areas, theme park gates,
             and visitor points from dynamic map location records.
         </p>
-        <a href="#" class="hero-secondary">Open Island Map</a>
+        <a href="{% url 'island_map' %}" class="hero-secondary">Open Island Map</a>
     </div>
 
     <div class="location-list">

@@ -37,7 +37,11 @@
                 <div>
                     <span class="soft-tag">{{ booking.get_status_display }}</span>
                     <h3>{{ booking.room }}</h3>
-                    <p>{{ booking.num_rooms }} room(s), {{ booking.check_in }} to {{ booking.check_out }}</p>
+                    <p>
+                        {{ booking.num_rooms }} room(s), {{ booking.adults }} adult(s),
+                        {{ booking.kids }} kid(s), {{ booking.check_in }} to {{ booking.check_out }}
+                    </p>
+                    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
                 </div>
                 <div class="account-meta">
                     <strong>{{ booking.created_at|date:"M d, Y" }}</strong>

@@ -15,6 +15,14 @@ from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from .permissions import IsAdmin
 
 
+def role_redirect(user):
+    if user.role == User.Role.HOTEL_MANAGER:
+        return 'hotel_staff'
+    if user.role == User.Role.FERRY_OPERATOR:
+        return 'ferry_staff'
+    return 'home'
+
+
 @login_required(login_url='login')
 def account_page(request):
     hotel_bookings = request.user.hotel_bookings.select_related(
@@ -49,14 +57,14 @@ def signup_page(request):
 
 def login_page(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect(role_redirect(request.user))
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
             messages.success(request, 'Welcome back to Maavaharu.')
-            return redirect('home')
+            return redirect(role_redirect(request.user))
     else:
         form = AuthenticationForm()
 

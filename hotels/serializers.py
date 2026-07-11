@@ -1,11 +1,25 @@
 from rest_framework import serializers
-from .models import Hotel, Room, HotelBooking, HotelPromotion
+from .models import Hotel, Room, RoomImage, HotelBooking, HotelPromotion, HotelPromotionImage
+
+
+class RoomImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomImage
+        fields = ['id', 'image', 'caption']
+
+
+class HotelPromotionImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelPromotionImage
+        fields = ['id', 'image', 'caption']
 
 
 class RoomSerializer(serializers.ModelSerializer):
+    images = RoomImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Room
-        fields = ['id', 'hotel', 'room_type', 'price_per_night', 'total_rooms']
+        fields = ['id', 'hotel', 'room_type', 'price_per_night', 'total_rooms', 'images']
 
 
 class HotelSerializer(serializers.ModelSerializer):
@@ -20,7 +34,8 @@ class HotelBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = HotelBooking
         fields = ['id', 'visitor', 'room', 'check_in', 'check_out',
-                  'num_rooms', 'status', 'created_at']
+                  'num_rooms', 'adults', 'kids', 'special_requests',
+                  'status', 'created_at']
         # The visitor is taken from the logged-in user, not the request body.
         read_only_fields = ['visitor', 'status', 'created_at']
 
@@ -31,6 +46,8 @@ class HotelBookingSerializer(serializers.ModelSerializer):
 
 
 class HotelPromotionSerializer(serializers.ModelSerializer):
+    images = HotelPromotionImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = HotelPromotion
-        fields = ['id', 'hotel', 'title', 'description', 'discount_percent', 'valid_until']
+        fields = ['id', 'hotel', 'title', 'description', 'discount_percent', 'valid_until', 'images']
