@@ -192,6 +192,39 @@ body {
         padding: 10px 12px;
         text-align: center;
     }
+
+    /* ===== MOBILE LEFT ALIGN FIX ===== */
+
+/* FORCE NAV MENU CONTENT ALIGNMENT */
+.nav-menu {
+    text-align: left; /* ensures everything starts from left */
+}
+
+/* NAV LINKS LEFT ALIGN */
+.nav-links {
+    display: flex;              /* override grid */
+    flex-direction: column;
+    align-items: flex-start;    /* pushes links to left */
+    width: 100%;
+    gap: 12px;
+}
+
+/* LINK STYLE */
+.nav-links a {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding-left: 12px; /* small indent instead of full center feel */
+}
+
+/* NAV ACTIONS (LOGIN AREA) */
+.nav-actions {
+    display: flex;              /* override grid */
+    flex-direction: column;
+    align-items: center;        /* keeps login centered like you wanted */
+    width: 100%;
+    margin-top: 10px;
+}
 }
 
 @media (max-width: 520px) {
