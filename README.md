@@ -17,5 +17,5 @@ Then open http://127.0.0.1:8000/api/ in your browser.
 - accounts   : custom User with roles + register/login (token auth)
 - hotels     : hotels, rooms, bookings, promotions
 - ferry      : schedules managed by ferry staff
-- themepark  : events (rides/shows/beach) + tickets
+- themepark  : events (activities/shows/beach) + tickets
 - core       : advertisements + island map locations

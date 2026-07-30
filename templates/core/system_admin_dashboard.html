@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}System Admin | Maavaharu{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260727">
+{% endblock %}
+
+{% block content %}
+<section class="staff-hero management-hero">
+    <div>
+        <p class="hero-kicker">System administration</p>
+        <h1>Maavaharu System Control</h1>
+        <p>
+            Oversee users, permissions, homepage advertisements, map locations,
+            sales reports, and system issues from one admin workspace.
+        </p>
+    </div>
+</section>
+
+<main class="management-shell">
+    <aside class="management-sidebar">
+        <div class="sidebar-title">
+            <strong>Administration</strong>
+            <span>System admin</span>
+        </div>
+        <nav>
+            <a class="{% if active_section == 'overview' %}active{% endif %}" href="?section=overview">Overview</a>
+            <a class="{% if active_section == 'users' %}active{% endif %}" href="?section=users">Users</a>
+            <a class="{% if active_section == 'content' %}active{% endif %}" href="?section=content">Ads</a>
+            <a class="{% if active_section == 'map' %}active{% endif %}" href="?section=map">Map</a>
+            <a class="{% if active_section == 'reports' %}active{% endif %}" href="?section=reports">Reports</a>
+            <a class="{% if active_section == 'issues' %}active{% endif %}" href="?section=issues">Issues</a>
+        </nav>
+    </aside>
+
+    <section class="management-content">
+        {% if active_section == 'overview' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Operations snapshot</p>
+                    <h2>Overview</h2>
+                </div>
+                <a class="management-action" href="/admin/">Django Admin</a>
+            </div>
+
+            <section class="staff-summary management-summary">
+                <article>
+                    <span>{{ total_users }}</span>
+                    <p>Total users</p>
+                </article>
+                <article>
+                    <span>{{ staff_count }}</span>
+                    <p>Staff accounts</p>
+                </article>
+                <article>
+                    <span>{{ active_ads_count }}</span>
+                    <p>Active ads</p>
+                </article>
+                <article>
+                    <span>{{ event_count }}</span>
+                    <p>Theme park records</p>
+                </article>
+                <article>
+                    <span>{{ open_issue_count }}</span>
+                    <p>Open issues</p>
+                </article>
+            </section>
+
+            <section class="management-card-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Access controls</p>
+                        <h3>User Permissions</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Visitors:</strong> {{ visitor_count }}</p>
+                        <p><strong>Staff/Admin:</strong> {{ staff_count }}</p>
+                        <p>Manage account roles from the Users section.</p>
+                    </div>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Public content</p>
+                        <h3>Ads And Map</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Advertisements:</strong> {{ advertisements|length }}</p>
+                        <p><strong>Map locations:</strong> {{ locations|length }}</p>
+                        <p>These records update the visitor homepage and island map.</p>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'users' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">User management interface</p>
+                    <h2>Accounts And Permissions</h2>
+                </div>
+            </div>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Current Role</th>
+                            <th>Access</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in users %}
+                            <tr>
+                                <td>
+                                    <strong>{{ account.username }}</strong><br>
+                                    <small>Joined {{ account.date_joined|date:"d M Y" }}</small>
+                                </td>
+                                <td>{{ account.email|default:"Not added" }}</td>
+                                <td>{{ account.get_role_display }}</td>
+                                <td>
+                                    <form method="post" class="staff-form compact-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update_user">
+                                        <input type="hidden" name="user_id" value="{{ account.id }}">
+                                        <label>Role</label>
+                                        <select name="role">
+                                            <option value="visitor" {% if account.role == 'visitor' %}selected{% endif %}>Visitor</option>
+                                            <option value="hotel_manager" {% if account.role == 'hotel_manager' %}selected{% endif %}>Hotel Manager</option>
+                                            <option value="ferry_operator" {% if account.role == 'ferry_operator' %}selected{% endif %}>Ferry Operator</option>
+                                            <option value="themepark_staff" {% if account.role == 'themepark_staff' %}selected{% endif %}>Theme Park Staff</option>
+                                            <option value="admin" {% if account.role == 'admin' %}selected{% endif %}>Admin</option>
+                                        </select>
+                                        <label><input type="checkbox" name="is_active" {% if account.is_active %}checked{% endif %}> Active</label>
+                                        <label><input type="checkbox" name="is_staff" {% if account.is_staff %}checked{% endif %}> Django admin access</label>
+                                        <label><input type="checkbox" name="is_superuser" {% if account.is_superuser %}checked{% endif %}> Superuser</label>
+                                        <button type="submit">Save</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_user">
+                                        <input type="hidden" name="user_id" value="{{ account.id }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">No users added yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if active_section == 'content' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Content management system</p>
+                    <h2>Homepage Advertisements</h2>
+                </div>
+                <a class="management-action" href="{% url 'home' %}">View Homepage</a>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Add advertisement</p>
+                        <h3>New Promo Content</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_advertisement">
+                        {{ advertisement_form.as_p }}
+                        <button type="submit">Add Advertisement</button>
+                    </form>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Homepage status</p>
+                        <h3>Active Content</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>{{ active_ads_count }}</strong> active advertisement records are visible to visitors.</p>
+                        <p>Deactivate an ad when it should be hidden without deleting the record.</p>
+                    </div>
+                </article>
+            </section>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Advertisement</th>
+                            <th>Status</th>
+                            <th>Image URL</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ad in advertisements %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ad.title }}</strong><br>
+                                    <small>{{ ad.content|default:"No description" }}</small>
+                                </td>
+                                <td>{% if ad.is_active %}Active{% else %}Hidden{% endif %}</td>
+                                <td>{{ ad.image_url|default:"No image URL" }}</td>
+                                <td>
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="toggle_advertisement">
+                                        <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
+                                        <button type="submit">{% if ad.is_active %}Hide{% else %}Activate{% endif %}</button>
+                                    </form>
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_advertisement">
+                                        <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4">No advertisements added yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if active_section == 'map' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Map data maintenance</p>
+                    <h2>Island Locations</h2>
+                </div>
+                <a class="management-action" href="{% url 'island_map' %}">View Map</a>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Public map image</p>
+                        <h3>Upload Zoomable Map</h3>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_map_image">
+                        {{ map_image_form.as_p }}
+                        <button type="submit">Upload Map Image</button>
+                    </form>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Add location</p>
+                        <h3>Map Point</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_location">
+                        {{ map_location_form.as_p }}
+                        <button type="submit">Add Map Location</button>
+                    </form>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Location guide</p>
+                        <h3>Suggested Categories</h3>
+                    </div>
+                    <div class="report-list">
+                        <p>Hotel, ferry dock, beach, theme park gate, activity area, picnic point.</p>
+                        <p>Latitude and longitude are shown to visitors. Pin X and Pin Y place the clickable icon on the uploaded image.</p>
+                        <p><strong>Pin guide:</strong> X 0 is left, X 100 is right. Y 0 is top, Y 100 is bottom.</p>
+                    </div>
+                </article>
+            </section>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Map Image</th>
+                            <th>Preview</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for image_record in map_images %}
+                            <tr>
+                                <td>
+                                    <strong>{{ image_record.title }}</strong><br>
+                                    <small>Uploaded {{ image_record.uploaded_at|date:"d M Y, H:i" }}</small>
+                                </td>
+                                <td>
+                                    <div class="staff-thumb-row staff-table-thumbs">
+                                        <img src="{{ image_record.image.url }}" alt="{{ image_record.title }}">
+                                    </div>
+                                </td>
+                                <td>{% if image_record.is_active %}Active on map page{% else %}Hidden{% endif %}</td>
+                                <td>
+                                    {% if not image_record.is_active %}
+                                        <form method="post" class="inline-action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="activate_map_image">
+                                            <input type="hidden" name="map_image_id" value="{{ image_record.id }}">
+                                            <button type="submit">Make Active</button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_map_image">
+                                        <input type="hidden" name="map_image_id" value="{{ image_record.id }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4">No map image uploaded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Coordinates</th>
+                            <th>Image Pin</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for location in locations %}
+                            <tr>
+                                <td><strong>{{ location.name }}</strong></td>
+                                <td>{{ location.category|default:"General" }}</td>
+                                <td>Lat {{ location.latitude }}<br>Lng {{ location.longitude }}</td>
+                                <td>X {{ location.pin_x }}%<br>Y {{ location.pin_y }}%</td>
+                                <td>{{ location.description|default:"No description" }}</td>
+                                <td>
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_location">
+                                        <input type="hidden" name="location_id" value="{{ location.id }}">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">No map locations added yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if active_section == 'reports' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">System reports and analytics</p>
+                    <h2>Usage And Sales</h2>
+                </div>
+            </div>
+
+            <section class="staff-summary management-summary">
+                <article>
+                    <span>{{ hotel_booking_count }}</span>
+                    <p>Hotel bookings</p>
+                </article>
+                <article>
+                    <span>{{ pending_hotel_count }}</span>
+                    <p>Pending hotel requests</p>
+                </article>
+                <article>
+                    <span>{{ activity_ticket_count }}</span>
+                    <p>Activity tickets sold</p>
+                </article>
+                <article>
+                    <span>{{ entrance_ticket_count }}</span>
+                    <p>Entrance tickets sold</p>
+                </article>
+                <article>
+                    <span>{{ ferry_schedule_count }}</span>
+                    <p>Ferry schedules</p>
+                </article>
+            </section>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Revenue estimate</p>
+                        <h3>Sales Summary</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Hotel revenue:</strong> MVR {{ hotel_revenue }}</p>
+                        <p><strong>Activity revenue:</strong> MVR {{ activity_revenue }}</p>
+                        <p><strong>Entrance revenue:</strong> MVR {{ entrance_revenue }}</p>
+                    </div>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Operations volume</p>
+                        <h3>System Usage</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Rooms:</strong> {{ room_count }}</p>
+                        <p><strong>Theme park activities/events:</strong> {{ event_count }}</p>
+                        <p><strong>Registered users:</strong> {{ total_users }}</p>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'issues' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Resolve issues and update content</p>
+                    <h2>System Issues</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Log issue</p>
+                        <h3>New Admin Task</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_issue">
+                        {{ issue_form.as_p }}
+                        <button type="submit">Add Issue</button>
+                    </form>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Open work</p>
+                        <h3>{{ open_issue_count }} Unresolved</h3>
+                    </div>
+                    <div class="report-list">
+                        <p>Use this for content fixes, account problems, broken map data, or booking support tasks.</p>
+                    </div>
+                </article>
+            </section>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for issue in issues %}
+                            <tr>
+                                <td>
+                                    <strong>{{ issue.title }}</strong><br>
+                                    <small>{{ issue.description|default:"No description" }}</small>
+                                </td>
+                                <td>{{ issue.get_status_display }}</td>
+                                <td>{{ issue.created_at|date:"d M Y, H:i" }}</td>
+                                <td>
+                                    <form method="post" class="staff-form compact-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update_issue">
+                                        <input type="hidden" name="issue_id" value="{{ issue.id }}">
+                                        <select name="status">
+                                            <option value="open" {% if issue.status == 'open' %}selected{% endif %}>Open</option>
+                                            <option value="in_progress" {% if issue.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                            <option value="resolved" {% if issue.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                        </select>
+                                        <button type="submit">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4">No system issues logged yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

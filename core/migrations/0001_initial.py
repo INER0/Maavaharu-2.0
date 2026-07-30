@@ -31,6 +31,29 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('latitude', models.DecimalField(decimal_places=6, max_digits=9)),
                 ('longitude', models.DecimalField(decimal_places=6, max_digits=9)),
+                ('pin_x', models.DecimalField(decimal_places=2, default=50, help_text='Horizontal pin position on the map image, from 0 to 100 percent.', max_digits=5)),
+                ('pin_y', models.DecimalField(decimal_places=2, default=50, help_text='Vertical pin position on the map image, from 0 to 100 percent.', max_digits=5)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='MapImage',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(default='Maavaharu Visitor Map', max_length=200)),
+                ('image', models.ImageField(upload_to='island_maps/')),
+                ('is_active', models.BooleanField(default=True)),
+                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SystemIssue',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(max_length=200)),
+                ('description', models.TextField(blank=True)),
+                ('status', models.CharField(choices=[('open', 'Open'), ('in_progress', 'In Progress'), ('resolved', 'Resolved')], default='open', max_length=20)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('resolved_at', models.DateTimeField(blank=True, null=True)),
             ],
         ),
     ]

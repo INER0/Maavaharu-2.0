@@ -35,9 +35,9 @@ class HotelBookingSerializer(serializers.ModelSerializer):
         model = HotelBooking
         fields = ['id', 'visitor', 'room', 'check_in', 'check_out',
                   'num_rooms', 'adults', 'kids', 'special_requests',
-                  'status', 'created_at']
+                  'status', 'verification_code', 'created_at']
         # The visitor is taken from the logged-in user, not the request body.
-        read_only_fields = ['visitor', 'status', 'created_at']
+        read_only_fields = ['visitor', 'status', 'verification_code', 'created_at']
 
     def validate(self, data):
         if data['check_out'] <= data['check_in']:

@@ -1,0 +1,63 @@
+<div class="staff-table-wrap">
+    <table class="staff-table">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Pictures</th>
+                <th>Type</th>
+                <th>Schedule</th>
+                <th>Time</th>
+                <th>Price</th>
+                <th>Capacity</th>
+                <th>Available</th>
+                <th>Update</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>
+                        {% if event.images.all %}
+                            <div class="staff-thumb-row staff-table-thumbs">
+                                {% for image in event.images.all %}
+                                    <img src="{{ image.image.url }}" alt="{{ event.name }}">
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="muted-text">No pictures</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ event.get_event_type_display }}</td>
+                    <td>{{ event.schedule_label }}</td>
+                    <td>{{ event.time|default:"Any time" }}</td>
+                    <td>MVR {{ event.price }}</td>
+                    <td>{{ event.capacity|default:"No set limit" }}</td>
+                    <td>{{ event.available_capacity|default:"No set limit" }}</td>
+                    <td>
+                        <form method="post" class="inline-status-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update_capacity">
+                            <input type="hidden" name="event_id" value="{{ event.id }}">
+                            <input type="number" name="available_capacity" value="{{ event.available_capacity|default_if_none:'' }}" min="0"{% if event.capacity is not None %} max="{{ event.capacity }}"{% endif %}>
+                            <button type="submit">Save</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" class="inline-action-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_event">
+                            <input type="hidden" name="event_id" value="{{ event.id }}">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="10">{{ empty_message }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

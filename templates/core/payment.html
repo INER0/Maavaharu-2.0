@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="checkout-hero">
+    <div>
+        <p class="hero-kicker">Payment screen</p>
+        <h1>Complete Payment</h1>
+        <p>This is a mock payment form for the project. No real card payment is processed.</p>
+    </div>
+</section>
+
+<section class="checkout-layout">
+    <form method="post" class="booking-form payment-form-card">
+        {% csrf_token %}
+        <h2>Payment Details</h2>
+        {{ form.as_p }}
+        <button type="submit" class="booking-submit">Pay MVR {{ cart_total }}</button>
+    </form>
+
+    <aside class="checkout-summary-card">
+        <h2>Order Summary</h2>
+        <p>{{ cart_items|length }} item(s)</p>
+        <strong>MVR {{ cart_total }}</strong>
+        <p class="checkout-note">
+            Booking and ticket verification IDs will be created after payment.
+        </p>
+    </aside>
+</section>
+{% endblock %}

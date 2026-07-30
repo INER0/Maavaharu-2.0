@@ -18,11 +18,20 @@
                 <a href="{% url 'ferry' %}">Ferry</a>
                 <a href="{% url 'themepark' %}">Theme Park</a>
                 <a href="{% url 'island_map' %}">Map</a>
+                {% if user.is_authenticated and user.role == 'visitor' %}
+                    <a href="{% url 'cart' %}">Cart ({{ request.session.cart|length }})</a>
+                {% endif %}
                 {% if user.is_authenticated and user.role == 'hotel_manager' %}
                     <a href="{% url 'hotel_staff' %}">Hotel Staff</a>
                 {% endif %}
                 {% if user.is_authenticated and user.role == 'ferry_operator' %}
                     <a href="{% url 'ferry_staff' %}">Ferry Staff</a>
+                {% endif %}
+                {% if user.is_authenticated and user.role == 'themepark_staff' %}
+                    <a href="{% url 'themepark_staff' %}">Theme Park Staff</a>
+                {% endif %}
+                {% if user.is_authenticated and user.role == 'admin' %}
+                    <a href="{% url 'system_admin' %}">System Admin</a>
                 {% endif %}
             </div>
 

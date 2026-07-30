@@ -4,155 +4,344 @@
 {% block title %}Ferry Staff | Maavaharu{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260711">
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260726">
 {% endblock %}
 
 {% block content %}
-<section class="staff-hero">
+<section class="staff-hero management-hero">
     <div>
-        <p class="hero-kicker">Ferry operator dashboard</p>
-        <h1>Maavaharu Ferry Staff</h1>
+        <p class="hero-kicker">Ferry operations</p>
+        <h1>Ferry Operator Management</h1>
         <p>
-            Manage ferry schedules, seat availability, and view guests with
-            confirmed Maavaharu Hotel bookings for boarding validation.
+            Manage daily, weekly, and special ferry routes, seat availability,
+            confirmed hotel booking validation, and passenger reports.
         </p>
     </div>
 </section>
 
-<section class="staff-summary">
-    <article>
-        <span>{{ upcoming_count }}</span>
-        <p>Upcoming trips</p>
-    </article>
-    <article>
-        <span>{{ total_capacity }}</span>
-        <p>Total capacity</p>
-    </article>
-    <article>
-        <span>{{ total_available_seats }}</span>
-        <p>Available seats</p>
-    </article>
-    <article>
-        <span>{{ eligible_passenger_count }}</span>
-        <p>Eligible bookings</p>
-    </article>
-</section>
-
-<section class="staff-grid">
-    <article class="staff-panel">
-        <div class="staff-panel-heading">
-            <p class="hero-kicker">Schedule CRUD</p>
-            <h2>Add Ferry Schedule</h2>
+<main class="management-shell">
+    <aside class="management-sidebar">
+        <div class="sidebar-title">
+            <strong>Management</strong>
+            <span>Ferry operator</span>
         </div>
-        <form method="post" class="staff-form">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="add_schedule">
-            {{ schedule_form.as_p }}
-            <button type="submit" class="booking-submit">Add Schedule</button>
-        </form>
-    </article>
+        <nav>
+            <a class="{% if active_section == 'overview' %}active{% endif %}" href="?section=overview">Overview</a>
+            <a class="{% if active_section == 'schedules' %}active{% endif %}" href="?section=schedules">Schedules</a>
+            <a class="{% if active_section == 'capacity' %}active{% endif %}" href="?section=capacity">Capacity</a>
+            <a class="{% if active_section == 'validation' %}active{% endif %}" href="?section=validation">Validation</a>
+            <a class="{% if active_section == 'passengers' %}active{% endif %}" href="?section=passengers">Passengers</a>
+            <a class="{% if active_section == 'reports' %}active{% endif %}" href="?section=reports">Reports</a>
+        </nav>
+    </aside>
 
-    <article class="staff-panel">
-        <div class="staff-panel-heading">
-            <p class="hero-kicker">Boarding rule</p>
-            <h2>Free Transfer Access</h2>
-        </div>
-        <div class="report-list">
-            <p><strong>No ferry tickets are sold.</strong></p>
-            <p>Visitors with confirmed Maavaharu Hotel bookings are eligible for ferry transfer.</p>
-            <p>Use the passenger validation list below before boarding.</p>
-        </div>
-    </article>
-</section>
+    <section class="management-content">
+        {% if active_section == 'overview' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Operations snapshot</p>
+                    <h2>Overview</h2>
+                </div>
+                <a class="management-action" href="{% url 'ferry' %}">View User Page</a>
+            </div>
 
-<section class="staff-section">
-    <div class="section-title booking-title">
-        <p>Schedule management</p>
-        <h2>Ferry Schedules</h2>
-    </div>
+            <section class="staff-summary management-summary">
+                <article>
+                    <span>{{ upcoming_count }}</span>
+                    <p>Active schedules</p>
+                </article>
+                <article>
+                    <span>{{ total_capacity }}</span>
+                    <p>Total capacity</p>
+                </article>
+                <article>
+                    <span>{{ total_available_seats }}</span>
+                    <p>Available seats</p>
+                </article>
+                <article>
+                    <span>{{ eligible_passenger_count }}</span>
+                    <p>Eligible bookings</p>
+                </article>
+            </section>
 
-    <div class="staff-table-wrap">
-        <table class="staff-table">
-            <thead>
-                <tr>
-                    <th>Route</th>
-                    <th>Date</th>
-                    <th>Departure</th>
-                    <th>Capacity</th>
-                    <th>Available Seats</th>
-                    <th>Update</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody>
+            <section class="management-card-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Boarding rule</p>
+                        <h3>Free Transfer Access</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>No ferry tickets are sold.</strong></p>
+                        <p>Visitors with confirmed Maavaharu Hotel bookings are eligible for ferry transfer.</p>
+                        <p>Validate the hotel booking UUID before boarding.</p>
+                    </div>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Schedule types</p>
+                        <h3>Daily, Weekly, Special</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Daily:</strong> runs every day.</p>
+                        <p><strong>Weekly:</strong> runs on selected weekdays.</p>
+                        <p><strong>Special:</strong> runs on one specific date.</p>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'schedules' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Schedule management dashboard</p>
+                    <h2>Route Schedules</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Create route</p>
+                        <h3>Add Ferry Schedule</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_schedule">
+                        {{ schedule_form.as_p }}
+                        <button type="submit" class="booking-submit">Add Schedule</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Route setup</p>
+                        <h3>How To Use</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Route name:</strong> optional display name, like Morning Lagoon Loop.</p>
+                        <p><strong>Origin and destination:</strong> actual boarding route.</p>
+                        <p><strong>Departure and return:</strong> shown to visitors and staff.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Activities and route schedule management</p>
+                    <h2>Ferry Schedules</h2>
+                </div>
+
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Route</th>
+                                <th>Type</th>
+                                <th>Runs</th>
+                                <th>Departure</th>
+                                <th>Return</th>
+                                <th>Capacity</th>
+                                <th>Available</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.route_label }}<br><span class="muted-text">{{ schedule.origin }} to {{ schedule.destination }}</span></td>
+                                    <td>{{ schedule.get_schedule_type_display }}</td>
+                                    <td>{{ schedule.schedule_label }}</td>
+                                    <td>{{ schedule.departure_time }}</td>
+                                    <td>{{ schedule.return_time|default:"" }}</td>
+                                    <td>{{ schedule.capacity }}</td>
+                                    <td>{{ schedule.available_seats }}</td>
+                                    <td>
+                                        <form method="post" class="inline-action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_schedule">
+                                            <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                                            <button type="submit">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8">No ferry schedules added yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'capacity' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Seat availability dashboard</p>
+                    <h2>Capacity Management</h2>
+                </div>
+            </div>
+
+            <section class="capacity-grid">
                 {% for schedule in schedules %}
-                    <tr>
-                        <td>{{ schedule.origin }} to {{ schedule.destination }}</td>
-                        <td>{{ schedule.date }}</td>
-                        <td>{{ schedule.departure_time }}</td>
-                        <td>{{ schedule.capacity }}</td>
-                        <td>{{ schedule.available_seats }}</td>
-                        <td>
-                            <form method="post" class="inline-status-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="update_seats">
-                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                                <input type="number" name="available_seats" value="{{ schedule.available_seats }}" min="0" max="{{ schedule.capacity }}">
-                                <button type="submit">Save</button>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="post" class="inline-action-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="delete_schedule">
-                                <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
-                                <button type="submit">Remove</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <article class="capacity-card">
+                        <span class="soft-tag">{{ schedule.get_schedule_type_display }}</span>
+                        <h3>{{ schedule.route_label }}</h3>
+                        <p>
+                            {{ schedule.schedule_label }} | Departure {{ schedule.departure_time }}
+                            {% if schedule.return_time %}| Return {{ schedule.return_time }}{% endif %}
+                        </p>
+                        <div class="capacity-bar">
+                            <span style="width: {% widthratio schedule.available_seats schedule.capacity 100 %}%;"></span>
+                        </div>
+                        <p><strong>{{ schedule.available_seats }}</strong> available of <strong>{{ schedule.capacity }}</strong> seats.</p>
+                        <form method="post" class="inline-status-form capacity-update-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update_seats">
+                            <input type="hidden" name="schedule_id" value="{{ schedule.id }}">
+                            <input type="number" name="available_seats" value="{{ schedule.available_seats }}" min="0" max="{{ schedule.capacity }}">
+                            <button type="submit">Update</button>
+                        </form>
+                    </article>
                 {% empty %}
-                    <tr>
-                        <td colspan="7">No ferry schedules added yet.</td>
-                    </tr>
+                    <article class="capacity-card">
+                        <h3>No schedules to monitor</h3>
+                        <p>Add ferry schedules first.</p>
+                    </article>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+            </section>
+        {% endif %}
 
-<section class="staff-section">
-    <div class="section-title booking-title">
-        <p>Passenger validation</p>
-        <h2>Confirmed Hotel Bookings</h2>
-    </div>
+        {% if active_section == 'validation' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Hotel booking validation interface</p>
+                    <h2>Validate Boarding Access</h2>
+                </div>
+            </div>
 
-    <div class="staff-table-wrap">
-        <table class="staff-table">
-            <thead>
-                <tr>
-                    <th>Visitor</th>
-                    <th>Room</th>
-                    <th>Stay Dates</th>
-                    <th>Guests</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in eligible_bookings %}
-                    <tr>
-                        <td>{{ booking.visitor.username }}</td>
-                        <td>{{ booking.room.room_type }}</td>
-                        <td>{{ booking.check_in }} to {{ booking.check_out }}</td>
-                        <td>{{ booking.adults }} adult(s), {{ booking.kids }} kid(s)</td>
-                        <td><span class="soft-tag">{{ booking.get_status_display }}</span></td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5">No confirmed hotel bookings currently eligible for ferry transfer.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Boarding desk</p>
+                        <h3>Check Hotel Booking</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="validate_booking">
+                        {{ validation_form.as_p }}
+                        <button type="submit" class="booking-submit">Validate Booking</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Validation result</p>
+                        <h3>Boarding Status</h3>
+                    </div>
+                    {% if validation_result %}
+                        <div class="validation-box {% if validation_result.eligible %}is-valid{% else %}is-invalid{% endif %}">
+                            <span class="soft-tag">
+                                {% if validation_result.eligible %}Eligible for transfer{% else %}Not eligible{% endif %}
+                            </span>
+                            <h3>Eligible Booking</h3>
+                            <p><strong>Verification ID:</strong> {{ validation_result.verification_code }}</p>
+                            <p><strong>Status:</strong> {{ validation_result.status }}</p>
+                            <p><strong>Result:</strong> {{ validation_result.message }}</p>
+                            <p><strong>Guest:</strong> {{ validation_result.guest }}</p>
+                            <p><strong>Hotel:</strong> {{ validation_result.hotel }}</p>
+                            <p><strong>Room:</strong> {{ validation_result.room }}</p>
+                            <p><strong>Stay:</strong> {{ validation_result.check_in }} to {{ validation_result.check_out }}</p>
+                            <p><strong>Guests:</strong> {{ validation_result.adults }} adult(s), {{ validation_result.kids }} kid(s)</p>
+                        </div>
+                    {% elif validation_error %}
+                        <div class="validation-box is-invalid">
+                            <span class="soft-tag">Not eligible</span>
+                            <p>{{ validation_error }}</p>
+                        </div>
+                    {% else %}
+                        <p class="muted-text">Enter a confirmed hotel booking verification ID before boarding.</p>
+                    {% endif %}
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'passengers' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Passenger list and trip reports</p>
+                    <h2>Eligible Hotel Bookings</h2>
+                </div>
+            </div>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Visitor</th>
+                            <th>Room</th>
+                            <th>Stay Dates</th>
+                            <th>Guests</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in eligible_bookings %}
+                            <tr>
+                                <td>{{ booking.verification_code }}</td>
+                                <td>{{ booking.visitor.username }}</td>
+                                <td>{{ booking.room.room_type }}</td>
+                                <td>{{ booking.check_in }} to {{ booking.check_out }}</td>
+                                <td>{{ booking.adults }} adult(s), {{ booking.kids }} kid(s)</td>
+                                <td><span class="soft-tag">{{ booking.get_status_display }}</span></td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">No confirmed hotel bookings currently eligible for ferry transfer.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if active_section == 'reports' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Passenger list and trip reports</p>
+                    <h2>Reports</h2>
+                </div>
+            </div>
+
+            <section class="report-metric-grid">
+                <article class="staff-panel">
+                    <span>{{ daily_count }}</span>
+                    <p>Daily schedules</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ weekly_count }}</span>
+                    <p>Weekly schedules</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ special_count }}</span>
+                    <p>Special schedules</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ total_capacity }}</span>
+                    <p>Total active capacity</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ total_available_seats }}</span>
+                    <p>Available active seats</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ eligible_passenger_count }}</span>
+                    <p>Eligible bookings</p>
+                </article>
+            </section>
+        {% endif %}
+    </section>
+</main>
 {% endblock %}

@@ -79,7 +79,7 @@
         </article>
         <article class="service-card">
             <h3>Theme Park</h3>
-            <p>Book rides, shows, and activity tickets for the planned theme park island.</p>
+            <p>Book activities, shows, and tickets for the planned theme park island.</p>
             <a href="{% url 'themepark' %}">View Activities</a>
         </article>
         <article class="service-card">
@@ -121,15 +121,23 @@
 
     <div class="activity-list">
         {% for event in events %}
-            <article class="activity-row">
+            <article class="activity-row{% if event.images.all %} has-thumb{% endif %}">
+                {% if event.images.all %}
+                    <div class="activity-row-thumb">
+                        {% for image in event.images.all %}
+                            {% if forloop.first %}
+                                <img src="{{ image.image.url }}" alt="{{ event.name }}">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <div>
                     <span class="soft-tag">{{ event.get_event_type_display }}</span>
                     <h3>{{ event.name }}</h3>
                     <p>{{ event.description|default:"Book tickets before available capacity runs out." }}</p>
                 </div>
                 <div class="activity-meta">
-                    <strong>{{ event.date }}</strong>
-                    <span>{{ event.time }}</span>
+                    <strong>{{ event.schedule_label }}</strong>
                     <span>MVR {{ event.price }}</span>
                 </div>
             </article>
@@ -137,7 +145,7 @@
             <article class="activity-row">
                 <div>
                     <h3>No activities added yet</h3>
-                    <p>Theme park staff can add rides, shows, and beach events for the nearby theme park island.</p>
+                    <p>Theme park staff can add activities, shows, and beach events for the nearby theme park island.</p>
                 </div>
             </article>
         {% endfor %}

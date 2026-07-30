@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout Complete | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="checkout-hero">
+    <div>
+        <p class="hero-kicker">Checkout complete</p>
+        <h1>Payment Confirmed</h1>
+        <p>Your booking and ticket records have been created. Use these IDs for staff verification.</p>
+    </div>
+</section>
+
+<section class="checkout-layout single-column-checkout">
+    <div class="checkout-list">
+        {% for record in records %}
+            <article class="checkout-row">
+                <div>
+                    <span class="soft-tag">{{ record.kind }}</span>
+                    <h3>{{ record.title }}</h3>
+                    <p>{{ record.description }}</p>
+                    <p><strong>Verification ID:</strong> {{ record.verification_code }}</p>
+                </div>
+            </article>
+        {% empty %}
+            <article class="checkout-row">
+                <div>
+                    <h3>No recent checkout records</h3>
+                    <p>Your completed checkout IDs will appear here after payment.</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+    <a href="{% url 'account' %}" class="booking-submit checkout-link">View My Account</a>
+</section>
+{% endblock %}

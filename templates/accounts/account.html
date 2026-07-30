@@ -9,7 +9,8 @@
         <h1>My Maavaharu Dashboard</h1>
         <p>
             View your Maavaharu Hotel bookings, theme park tickets, and beach
-            event bookings in one place.
+            event bookings in one place. Show the verification ID to staff when
+            they need to confirm your booking or ticket.
         </p>
     </div>
 </section>
@@ -21,7 +22,11 @@
     </article>
     <article>
         <span>{{ themepark_tickets|length }}</span>
-        <p>Theme park tickets</p>
+        <p>Activity tickets</p>
+    </article>
+    <article>
+        <span>{{ themepark_entrance_tickets|length }}</span>
+        <p>Entrance tickets</p>
     </article>
 </section>
 
@@ -41,6 +46,7 @@
                         {{ booking.num_rooms }} room(s), {{ booking.adults }} adult(s),
                         {{ booking.kids }} kid(s), {{ booking.check_in }} to {{ booking.check_out }}
                     </p>
+                    <p><strong>Verification ID:</strong> {{ booking.verification_code }}</p>
                     <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
                 </div>
                 <div class="account-meta">
@@ -62,7 +68,40 @@
 
 <section class="account-section">
     <div class="section-title booking-title">
-        <p>Theme park and beach events</p>
+        <p>Theme park admission</p>
+        <h2>My Entrance Tickets</h2>
+    </div>
+
+    <div class="account-list">
+        {% for ticket in themepark_entrance_tickets %}
+            <article class="account-row">
+                <div>
+                    <span class="soft-tag">General admission</span>
+                    <h3>Theme Park Entrance</h3>
+                    <p>{{ ticket.quantity }} ticket(s), visit date {{ ticket.visit_date }}</p>
+                    <p><strong>Verification ID:</strong> {{ ticket.verification_code }}</p>
+                    <p><strong>Total:</strong> MVR {{ ticket.total_price }}</p>
+                </div>
+                <div class="account-meta">
+                    <strong>{{ ticket.purchased_at|date:"M d, Y" }}</strong>
+                    <span>{{ ticket.channel|title }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="account-row">
+                <div>
+                    <h3>No entrance tickets yet</h3>
+                    <p>Your general theme park admission tickets will appear here.</p>
+                </div>
+                <a class="account-action" href="{% url 'themepark' %}">Buy entrance</a>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="account-section">
+    <div class="section-title booking-title">
+        <p>Theme park activities and beach events</p>
         <h2>My Activity Tickets</h2>
     </div>
 
@@ -72,7 +111,8 @@
                 <div>
                     <span class="soft-tag">{{ ticket.event.get_event_type_display }}</span>
                     <h3>{{ ticket.event.name }}</h3>
-                    <p>{{ ticket.quantity }} ticket(s), {{ ticket.event.date }} at {{ ticket.event.time }}</p>
+                    <p>{{ ticket.quantity }} ticket(s), {{ ticket.event.schedule_label }}</p>
+                    <p><strong>Verification ID:</strong> {{ ticket.verification_code }}</p>
                 </div>
                 <div class="account-meta">
                     <strong>{{ ticket.purchased_at|date:"M d, Y" }}</strong>
@@ -83,7 +123,7 @@
             <article class="account-row">
                 <div>
                     <h3>No activity tickets yet</h3>
-                    <p>Your ride, show, and beach event tickets will appear here.</p>
+                    <p>Your activity, show, and beach event tickets will appear here.</p>
                 </div>
                 <a class="account-action" href="{% url 'themepark' %}">Explore events</a>
             </article>

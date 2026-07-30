@@ -20,6 +20,10 @@ def role_redirect(user):
         return 'hotel_staff'
     if user.role == User.Role.FERRY_OPERATOR:
         return 'ferry_staff'
+    if user.role == User.Role.THEMEPARK_STAFF:
+        return 'themepark_staff'
+    if user.role == User.Role.ADMIN or user.is_superuser:
+        return 'system_admin'
     return 'home'
 
 
@@ -31,10 +35,12 @@ def account_page(request):
     themepark_tickets = request.user.themepark_tickets.select_related(
         'event'
     ).order_by('-purchased_at')
+    themepark_entrance_tickets = request.user.themepark_entrance_tickets.order_by('-purchased_at')
 
     return render(request, 'accounts/account.html', {
         'hotel_bookings': hotel_bookings,
         'themepark_tickets': themepark_tickets,
+        'themepark_entrance_tickets': themepark_entrance_tickets,
     })
 
 

@@ -818,10 +818,122 @@ body {
     max-width: 740px;
 }
 
+.park-hero-redesign {
+    min-height: 70vh;
+}
+
+.park-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+.park-overview-strip {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: -42px auto 0;
+    max-width: 1040px;
+    padding: 0 24px 42px;
+    position: relative;
+    z-index: 2;
+}
+
+.park-overview-strip article {
+    background: rgba(255, 252, 244, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(46, 134, 149, 0.12);
+    padding: 18px;
+    text-align: center;
+}
+
+.park-overview-strip span {
+    color: #0b7183;
+    display: block;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1;
+}
+
+.park-overview-strip p {
+    color: #58717a;
+    font-weight: 800;
+    margin: 8px 0 0;
+}
+
+.park-ticket-band,
+.park-showcase-section,
+.park-ticket-history {
+    margin: 0 auto;
+    max-width: 1120px;
+    padding: 46px 24px 64px;
+}
+
+.park-ticket-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.park-ticket-card,
+.park-feature-card,
+.park-empty-card {
+    background: rgba(255, 252, 244, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(46, 134, 149, 0.12);
+}
+
+.park-ticket-card {
+    display: grid;
+    gap: 20px;
+    padding: 22px;
+}
+
+.entrance-card {
+    background: linear-gradient(145deg, rgba(255, 246, 221, 0.95), rgba(232, 249, 245, 0.92));
+}
+
+.beach-ticket-card {
+    background: linear-gradient(145deg, rgba(232, 249, 245, 0.94), rgba(255, 242, 223, 0.94));
+}
+
+.ticket-card-copy h3,
+.park-feature-body h3,
+.park-empty-card h3 {
+    color: #173f4a;
+    margin: 0 0 8px;
+}
+
+.ticket-card-copy p,
+.park-feature-body p,
+.park-empty-card p {
+    color: #58717a;
+    margin: 0;
+}
+
+.ticket-card-copy strong {
+    color: #0b7183;
+    display: block;
+    margin-top: 14px;
+}
+
+.compact-ticket-form {
+    display: grid;
+    gap: 10px;
+}
+
+.compact-ticket-form label {
+    margin-top: 0;
+}
+
 .park-date-strip {
     margin: 0 auto;
     max-width: 1120px;
-    padding: 54px 24px 18px;
+    padding: 26px 24px 18px;
 }
 
 .date-pill-list {
@@ -871,6 +983,10 @@ body {
     padding: 22px;
 }
 
+.event-image-strip {
+    grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+}
+
 .park-event-card h3,
 .park-ticket-panel h2,
 .beach-event-copy h2 {
@@ -905,6 +1021,62 @@ body {
     padding: 24px;
     position: sticky;
     top: 104px;
+}
+
+.park-promotion-strip {
+    margin: 0 auto;
+    max-width: 1120px;
+    padding: 0 24px 64px;
+}
+
+.park-showcase-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.park-feature-card {
+    overflow: hidden;
+}
+
+.park-feature-media {
+    background: #e8f9f5;
+}
+
+.park-feature-media img {
+    aspect-ratio: 16 / 10;
+    display: block;
+    object-fit: cover;
+    width: 100%;
+}
+
+.park-feature-body,
+.park-empty-card {
+    padding: 22px;
+}
+
+.special-showcase {
+    padding-top: 12px;
+}
+
+.redesigned-promo-strip {
+    padding-top: 12px;
+}
+
+.redesigned-beach-section {
+    padding-bottom: 64px;
+}
+
+.beach-showcase-grid {
+    margin: 34px auto 0;
+    max-width: 1120px;
+    padding: 0 24px;
+}
+
+.park-history-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .beach-event-section {
@@ -949,7 +1121,15 @@ body {
     .ferry-info-strip,
     .ferry-details,
     .park-layout,
-    .beach-event-content {
+    .beach-event-content,
+    .park-ticket-grid,
+    .park-showcase-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .park-layout,
+    .beach-event-content,
+    .park-history-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1009,17 +1189,163 @@ body {
 
     .park-date-strip,
     .park-layout,
-    .beach-event-content {
+    .park-promotion-strip,
+    .beach-event-content,
+    .park-ticket-band,
+    .park-showcase-section,
+    .park-ticket-history,
+    .beach-showcase-grid {
         padding-left: 18px;
         padding-right: 18px;
     }
 
-    .park-card-grid {
+    .park-card-grid,
+    .park-ticket-grid,
+    .park-showcase-grid,
+    .park-overview-strip {
         grid-template-columns: 1fr;
+    }
+
+    .park-overview-strip {
+        margin-top: -26px;
     }
 
     .beach-event-section {
         padding: 48px 0;
+    }
+}
+
+.checkout-hero {
+    align-items: center;
+    background:
+        linear-gradient(rgba(255, 248, 232, 0.42), rgba(232, 249, 245, 0.94)),
+        url("../images/Island Picture 1.jpeg"),
+        linear-gradient(135deg, #f9c9b6 0%, #c9ecf5 44%, #e8f8e8 100%);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    min-height: 42vh;
+    padding: 130px 24px 70px;
+    text-align: center;
+}
+
+.checkout-hero > div {
+    margin: 0 auto;
+    max-width: 760px;
+}
+
+.checkout-hero h1 {
+    color: #173f4a;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(42px, 6vw, 70px);
+    font-weight: 500;
+    line-height: 1.02;
+    margin: 0;
+}
+
+.checkout-hero p:not(.hero-kicker) {
+    color: #42606a;
+    font-size: clamp(17px, 2vw, 21px);
+    margin: 18px auto 0;
+    max-width: 680px;
+}
+
+.checkout-layout {
+    align-items: start;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    margin: 0 auto;
+    max-width: 1120px;
+    padding: 56px 24px;
+}
+
+.single-column-checkout {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.checkout-list {
+    display: grid;
+    gap: 16px;
+}
+
+.checkout-row,
+.checkout-summary-card,
+.payment-form-card {
+    background: rgba(255, 252, 244, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(46, 134, 149, 0.12);
+}
+
+.checkout-row {
+    align-items: center;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr auto;
+    padding: 20px;
+}
+
+.checkout-row h3,
+.checkout-summary-card h2,
+.payment-form-card h2 {
+    color: #173f4a;
+    margin: 0 0 8px;
+}
+
+.checkout-row p,
+.checkout-summary-card p,
+.checkout-note {
+    color: #58717a;
+    margin: 0;
+}
+
+.checkout-meta {
+    display: grid;
+    gap: 10px;
+    justify-items: end;
+}
+
+.checkout-meta strong,
+.checkout-summary-card strong {
+    color: #0b7183;
+    font-size: 22px;
+}
+
+.checkout-summary-card,
+.payment-form-card {
+    padding: 22px;
+}
+
+.checkout-link {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+    text-decoration: none;
+}
+
+.checkout-secondary-link {
+    color: #0b7183;
+    display: inline-block;
+    font-weight: 800;
+    margin-top: 14px;
+}
+
+.payment-form-card p {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+@media (max-width: 760px) {
+    .checkout-layout,
+    .checkout-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-meta {
+        justify-items: start;
     }
 }
 
@@ -1225,6 +1551,162 @@ body {
     position: relative;
 }
 
+.zoom-map-shell {
+    background: rgba(255, 252, 244, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 22px;
+    box-shadow: 0 24px 58px rgba(46, 134, 149, 0.16);
+    overflow: hidden;
+}
+
+.zoom-map-toolbar {
+    align-items: center;
+    background: rgba(255, 252, 244, 0.96);
+    border-bottom: 1px solid rgba(32, 183, 189, 0.16);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 12px;
+}
+
+.zoom-map-toolbar button {
+    background: #e8f9f5;
+    border: 1px solid rgba(32, 183, 189, 0.28);
+    border-radius: 999px;
+    color: #0b7183;
+    cursor: pointer;
+    font-weight: 900;
+    min-height: 38px;
+    min-width: 42px;
+    padding: 8px 14px;
+}
+
+.zoom-map-toolbar button:hover {
+    background: #25bdc3;
+    color: #fff;
+}
+
+.zoom-map-viewport {
+    align-items: center;
+    aspect-ratio: 16 / 10;
+    background:
+        linear-gradient(135deg, rgba(135, 217, 228, 0.42), rgba(232, 249, 245, 0.82)),
+        #dff8f5;
+    cursor: grab;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    touch-action: none;
+}
+
+.zoom-map-viewport:active {
+    cursor: grabbing;
+}
+
+.zoom-map-viewport img {
+    height: 100%;
+    object-fit: contain;
+    transform-origin: center center;
+    transition: transform 0.12s ease-out;
+    user-select: none;
+    width: 100%;
+    will-change: transform;
+}
+
+.map-pin-layer {
+    height: 100%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transform-origin: center center;
+    transition: transform 0.12s ease-out;
+    width: 100%;
+    will-change: transform;
+    z-index: 2;
+}
+
+.image-map-pin {
+    align-items: center;
+    background: #fffaf0;
+    border: 2px solid #20b7bd;
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(23, 63, 74, 0.24);
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    padding: 0;
+    pointer-events: auto;
+    position: absolute;
+    transform: translate(-50%, -100%);
+    width: 32px;
+}
+
+.image-map-pin::after {
+    background: #fffaf0;
+    border-bottom: 2px solid #20b7bd;
+    border-right: 2px solid #20b7bd;
+    bottom: -7px;
+    content: "";
+    height: 12px;
+    position: absolute;
+    transform: rotate(45deg);
+    width: 12px;
+}
+
+.image-map-pin span {
+    background: #0b7183;
+    border-radius: 999px;
+    display: block;
+    height: 10px;
+    position: relative;
+    width: 10px;
+    z-index: 1;
+}
+
+.image-map-pin:hover {
+    background: #25bdc3;
+    transform: translate(-50%, -100%) scale(1.08);
+}
+
+.image-map-pin:hover span {
+    background: #fff;
+}
+
+.map-pin-popup {
+    background: rgba(255, 252, 244, 0.96);
+    border: 1px solid rgba(32, 183, 189, 0.24);
+    border-radius: 16px;
+    box-shadow: 0 18px 42px rgba(23, 63, 74, 0.22);
+    max-width: min(280px, calc(100% - 32px));
+    padding: 16px;
+    pointer-events: auto;
+    position: absolute;
+    transform: translate(-50%, calc(-100% - 46px));
+    width: max-content;
+    z-index: 4;
+}
+
+.map-pin-popup h3 {
+    color: #173f4a;
+    margin: 8px 0 6px;
+}
+
+.map-pin-popup p {
+    color: #58717a;
+    margin: 0;
+}
+
+.fallback-map-visual {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    height: 100%;
+    width: 100%;
+}
+
 .map-water-ring {
     border: 2px dashed rgba(255, 255, 255, 0.62);
     border-radius: 50%;
@@ -1386,6 +1868,24 @@ body {
     .island-map-visual {
         aspect-ratio: 1 / 1;
         border-radius: 22px;
+    }
+
+    .zoom-map-toolbar {
+        justify-content: center;
+    }
+
+    .zoom-map-viewport {
+        aspect-ratio: 1 / 1;
+    }
+
+    .image-map-pin {
+        height: 28px;
+        width: 28px;
+    }
+
+    .map-pin-popup {
+        max-width: calc(100% - 24px);
+        transform: translate(-50%, calc(-100% - 38px));
     }
 
     .location-card-grid {
@@ -1747,6 +2247,17 @@ body {
     padding: 20px;
 }
 
+.activity-row.has-thumb {
+    grid-template-columns: 96px 1fr auto;
+}
+
+.activity-row-thumb img {
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    object-fit: cover;
+    width: 100%;
+}
+
 .activity-meta {
     color: #42606a;
     display: grid;
@@ -1815,6 +2326,10 @@ body {
     .service-grid,
     .map-section,
     .activity-row {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-row.has-thumb {
         grid-template-columns: 1fr;
     }
 

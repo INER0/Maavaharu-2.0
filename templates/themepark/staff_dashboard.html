@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Theme Park Staff | Maavaharu{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260723">
+{% endblock %}
+
+{% block content %}
+<section class="staff-hero management-hero">
+    <div>
+        <p class="hero-kicker">Theme park operations</p>
+        <h1>Theme Park Management</h1>
+        <p>
+            Manage schedules, ticket sales, capacity, visitor bookings,
+            promotions, reports, and on-site validation from one staff console.
+        </p>
+    </div>
+</section>
+
+<main class="management-shell">
+    <aside class="management-sidebar">
+        <div class="sidebar-title">
+            <strong>Management</strong>
+            <span>Theme park staff</span>
+        </div>
+        <nav>
+            <a class="{% if active_section == 'overview' %}active{% endif %}" href="?section=overview">Overview</a>
+            <a class="{% if active_section == 'schedule' %}active{% endif %}" href="?section=schedule">Schedule</a>
+            <a class="{% if active_section == 'capacity' %}active{% endif %}" href="?section=capacity">Capacity</a>
+            <a class="{% if active_section == 'bookings' %}active{% endif %}" href="?section=bookings">Bookings</a>
+            <a class="{% if active_section == 'tickets' %}active{% endif %}" href="?section=tickets">Ticket Sales</a>
+            <a class="{% if active_section == 'validation' %}active{% endif %}" href="?section=validation">Validation</a>
+            <a class="{% if active_section == 'promotions' %}active{% endif %}" href="?section=promotions">Promotions</a>
+            <a class="{% if active_section == 'reports' %}active{% endif %}" href="?section=reports">Reports</a>
+        </nav>
+    </aside>
+
+    <section class="management-content">
+        {% if active_section == 'overview' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Operations snapshot</p>
+                    <h2>Overview</h2>
+                </div>
+                <a class="management-action" href="{% url 'themepark' %}">View User Page</a>
+            </div>
+
+            <section class="staff-summary management-summary">
+                <article>
+                    <span>{{ upcoming_event_count }}</span>
+                    <p>Upcoming events</p>
+                </article>
+                <article>
+                    <span>{{ available_capacity }}</span>
+                    <p>Tracked spots left</p>
+                </article>
+                <article>
+                    <span>{{ sold_tickets }}</span>
+                    <p>Activity tickets sold</p>
+                </article>
+                <article>
+                    <span>{{ entrance_admissions }}</span>
+                    <p>Entrance admissions</p>
+                </article>
+                <article>
+                    <span>MVR {{ total_revenue }}</span>
+                    <p>Total revenue</p>
+                </article>
+            </section>
+
+            <section class="management-card-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Today focus</p>
+                        <h3>Management Areas</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Schedule:</strong> Create weekly activities and special dated events.</p>
+                        <p><strong>Capacity:</strong> Monitor sold spots and update availability.</p>
+                        <p><strong>Validation:</strong> Check tickets at the entrance using the visitor verification ID.</p>
+                    </div>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Ticket split</p>
+                        <h3>Admission vs Activities</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Entrance ticket:</strong> general admission, MVR 100 per person.</p>
+                        <p><strong>Activity ticket:</strong> specific activity, show, or beach event.</p>
+                        <p>Entrance tickets do not reduce activity capacity.</p>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'schedule' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Event scheduling and management UI</p>
+                    <h2>Schedule Management</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Weekly schedule</p>
+                        <h3>Add Weekly Activity</h3>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_weekly_event">
+                        {{ weekly_event_form.as_p }}
+                        <button type="submit" class="booking-submit">Add Weekly Activity</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Special date</p>
+                        <h3>Add Special Event</h3>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_special_event">
+                        {{ special_event_form.as_p }}
+                        <button type="submit" class="booking-submit">Add Special Event</button>
+                    </form>
+                </article>
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Weekly activities</p>
+                    <h2>Weekly Activities, Shows, And Beach Events</h2>
+                </div>
+                {% include 'themepark/includes/event_table.html' with events=weekly_events empty_message='No weekly activities added yet.' %}
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Special dated events</p>
+                    <h2>Special Shows And One-Off Events</h2>
+                </div>
+                {% include 'themepark/includes/event_table.html' with events=special_events empty_message='No special dated events added yet.' %}
+            </section>
+        {% endif %}
+
+        {% if active_section == 'capacity' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Capacity monitoring dashboard</p>
+                    <h2>Capacity Management</h2>
+                </div>
+            </div>
+
+            <section class="capacity-grid">
+                {% for event in events %}
+                    <article class="capacity-card">
+                        <div>
+                            <span class="soft-tag">{{ event.get_event_type_display }}</span>
+                            <h3>{{ event.name }}</h3>
+                            <p>{{ event.schedule_label }}</p>
+                        </div>
+                        {% if event.capacity %}
+                            <div class="capacity-bar">
+                                <span style="width: {{ event.capacity_percent }}%;"></span>
+                            </div>
+                            <p>
+                                <strong>{{ event.booked_total }}</strong> booked,
+                                <strong>{{ event.available_capacity|default:0 }}</strong> available of
+                                <strong>{{ event.capacity }}</strong>
+                            </p>
+                        {% else %}
+                            <p><strong>No set limit</strong> for this activity.</p>
+                        {% endif %}
+                        <form method="post" class="inline-status-form capacity-update-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update_capacity">
+                            <input type="hidden" name="event_id" value="{{ event.id }}">
+                            <input type="number" name="available_capacity" value="{{ event.available_capacity|default_if_none:'' }}" min="0"{% if event.capacity is not None %} max="{{ event.capacity }}"{% endif %}>
+                            <button type="submit">Update</button>
+                        </form>
+                    </article>
+                {% empty %}
+                    <article class="capacity-card">
+                        <h3>No events to monitor</h3>
+                        <p>Add weekly activities or special events first.</p>
+                    </article>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% if active_section == 'bookings' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Booking management for individual activities</p>
+                    <h2>Activity Booking Summary</h2>
+                </div>
+            </div>
+
+            <div class="staff-table-wrap">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Activity / Event</th>
+                            <th>Type</th>
+                            <th>Schedule</th>
+                            <th>Online bookings</th>
+                            <th>Entrance sales</th>
+                            <th>Total booked</th>
+                            <th>Visitors</th>
+                            <th>Remaining capacity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td>{{ event.name }}</td>
+                                <td>{{ event.get_event_type_display }}</td>
+                                <td>{{ event.schedule_label }}</td>
+                                <td>{{ event.online_booked }}</td>
+                                <td>{{ event.entrance_booked }}</td>
+                                <td>{{ event.booked_total }}</td>
+                                <td>{{ event.visitor_count }}</td>
+                                <td>
+                                    {% if event.available_capacity is not None %}
+                                        {{ event.available_capacity }}
+                                    {% else %}
+                                        No set limit
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8">No activity bookings to manage yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if active_section == 'tickets' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Ticket sales CRUD dashboard</p>
+                    <h2>Ticket Sales</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Activity booking</p>
+                        <h3>Sell Activity Ticket</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="sell_activity_ticket">
+                        {{ activity_ticket_form.as_p }}
+                        <button type="submit" class="booking-submit">Record Activity Sale</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Park admission</p>
+                        <h3>Sell Entrance Ticket</h3>
+                    </div>
+                    <p class="muted-text">Entrance tickets are fixed at MVR 100 per person.</p>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="sell_entrance_ticket">
+                        {{ entrance_ticket_form.as_p }}
+                        <button type="submit" class="booking-submit">Record Entrance Sale</button>
+                    </form>
+                </article>
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Activity ticket sales CRUD and validation</p>
+                    <h2>Activity Ticket Records</h2>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Visitor</th>
+                                <th>Event</th>
+                                <th>Quantity</th>
+                                <th>Channel</th>
+                                <th>Purchased</th>
+                                <th>Validation</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                                <tr>
+                                    <td>{{ ticket.verification_code }}</td>
+                                    <td>{{ ticket.visitor.username|default:"Entrance guest" }}</td>
+                                    <td>{{ ticket.event.name }}</td>
+                                    <td>{{ ticket.quantity }}</td>
+                                    <td>{{ ticket.get_channel_display }}</td>
+                                    <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                                    <td><span class="soft-tag">Valid ticket</span></td>
+                                    <td>
+                                        <form method="post" class="inline-action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_ticket">
+                                            <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                                            <button type="submit">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8">No theme park tickets sold yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Entrance ticket sales CRUD and validation</p>
+                    <h2>Entrance Ticket Records</h2>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Visitor</th>
+                                <th>Visit Date</th>
+                                <th>Quantity</th>
+                                <th>Price Each</th>
+                                <th>Total</th>
+                                <th>Channel</th>
+                                <th>Purchased</th>
+                                <th>Validation</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in entrance_tickets %}
+                                <tr>
+                                    <td>{{ ticket.verification_code }}</td>
+                                    <td>{{ ticket.visitor.username|default:"Entrance guest" }}</td>
+                                    <td>{{ ticket.visit_date }}</td>
+                                    <td>{{ ticket.quantity }}</td>
+                                    <td>MVR {{ ticket.price_per_ticket }}</td>
+                                    <td>MVR {{ ticket.total_price }}</td>
+                                    <td>{{ ticket.get_channel_display }}</td>
+                                    <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                                    <td><span class="soft-tag">Valid entrance</span></td>
+                                    <td>
+                                        <form method="post" class="inline-action-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_entrance_ticket">
+                                            <input type="hidden" name="entrance_ticket_id" value="{{ ticket.id }}">
+                                            <button type="submit">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="10">No entrance tickets sold yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'validation' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">On-site ticket validation interface</p>
+                    <h2>Validate Tickets</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Entrance desk</p>
+                        <h3>Check Ticket ID</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="validate_ticket">
+                        {{ validation_form.as_p }}
+                        <button type="submit" class="booking-submit">Check Ticket</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Validation result</p>
+                        <h3>Ticket Status</h3>
+                    </div>
+                    {% if validation_result %}
+                        <div class="validation-box is-valid">
+                            <span class="soft-tag">Valid ticket</span>
+                            <h3>{{ validation_result.kind }}</h3>
+                            <p><strong>Verification ID:</strong> {{ validation_result.verification_code }}</p>
+                            <p><strong>Status:</strong> {{ validation_result.status }}</p>
+                            <p><strong>Guest:</strong> {{ validation_result.guest }}</p>
+                            <p><strong>Item:</strong> {{ validation_result.name }}</p>
+                            <p><strong>Type:</strong> {{ validation_result.event_type }}</p>
+                            <p><strong>Quantity:</strong> {{ validation_result.quantity }}</p>
+                            <p><strong>Schedule:</strong> {{ validation_result.schedule }}</p>
+                            <p><strong>Channel:</strong> {{ validation_result.channel }}</p>
+                            <p><strong>Purchased:</strong> {{ validation_result.purchased|date:"M d, Y H:i" }}</p>
+                        </div>
+                    {% elif validation_error %}
+                        <div class="validation-box is-invalid">
+                            <span class="soft-tag">Not found</span>
+                            <p>{{ validation_error }}</p>
+                        </div>
+                    {% else %}
+                        <p class="muted-text">Enter the visitor verification ID to check whether it exists and view the ticket details.</p>
+                    {% endif %}
+                </article>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'promotions' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Promotions for activities</p>
+                    <h2>Promotion Management</h2>
+                </div>
+            </div>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Create promotion</p>
+                        <h3>Add Activity Promotion</h3>
+                    </div>
+                    <form method="post" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_promotion">
+                        {{ promotion_form.as_p }}
+                        <button type="submit" class="booking-submit">Add Promotion</button>
+                    </form>
+                </article>
+
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Structure</p>
+                        <h3>Promotion Rules</h3>
+                    </div>
+                    <div class="report-list">
+                        <p>Promotions can be discounts or normal advertisements.</p>
+                        <p>Each promotion is connected to one activity, show, or beach event.</p>
+                        <p>Visitors see active promotion cards on the theme park page.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Active content</p>
+                    <h2>Activity Promotions</h2>
+                </div>
+                <div class="staff-card-grid">
+                    {% for promotion in promotions %}
+                        <article class="staff-card">
+                            <p class="staff-preview-label">Website preview</p>
+                            <div class="staff-site-preview">
+                                {% if promotion.discount_percent %}
+                                    <span class="soft-tag">{{ promotion.discount_percent }}% off</span>
+                                {% else %}
+                                    <span class="soft-tag">Featured</span>
+                                {% endif %}
+                                <h3>{{ promotion.title }}</h3>
+                                <p>{{ promotion.description|default:"Promotion for theme park visitors." }}</p>
+                                <p><strong>Event:</strong> {{ promotion.event.name }}</p>
+                                <strong>Valid until {{ promotion.valid_until }}</strong>
+                            </div>
+                            <form method="post" class="inline-action-form staff-card-action">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_promotion">
+                                <input type="hidden" name="promotion_id" value="{{ promotion.id }}">
+                                <button type="submit">Remove Promotion</button>
+                            </form>
+                        </article>
+                    {% empty %}
+                        <article class="staff-card">
+                            <h3>No activity promotions yet</h3>
+                            <p>Add activity, show, or beach event promotions using the form above.</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if active_section == 'reports' %}
+            <div class="management-heading">
+                <div>
+                    <p class="hero-kicker">Reports on ticket sales and visitors</p>
+                    <h2>Reports</h2>
+                </div>
+            </div>
+
+            <section class="report-metric-grid">
+                <article class="staff-panel">
+                    <span>{{ sold_tickets }}</span>
+                    <p>Total activity tickets sold</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ online_tickets }}</span>
+                    <p>Online activity tickets</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ entrance_activity_tickets }}</span>
+                    <p>Entrance activity tickets</p>
+                </article>
+                <article class="staff-panel">
+                    <span>{{ entrance_admissions }}</span>
+                    <p>Park entrance admissions</p>
+                </article>
+                <article class="staff-panel">
+                    <span>MVR {{ activity_revenue }}</span>
+                    <p>Activity revenue</p>
+                </article>
+                <article class="staff-panel">
+                    <span>MVR {{ entrance_revenue }}</span>
+                    <p>Entrance revenue</p>
+                </article>
+            </section>
+
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Visitor report</p>
+                        <h3>Visitors</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Unique activity visitors:</strong> {{ unique_online_visitors }}</p>
+                        <p><strong>Unique entrance visitors:</strong> {{ unique_entrance_visitors }}</p>
+                        <p><strong>Total revenue:</strong> MVR {{ total_revenue }}</p>
+                    </div>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Availability report</p>
+                        <h3>Capacity</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Total tracked capacity:</strong> {{ total_capacity }}</p>
+                        <p><strong>Available future capacity:</strong> {{ available_capacity }}</p>
+                        <p>Activities with no set limit are excluded from capacity totals.</p>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

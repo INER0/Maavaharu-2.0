@@ -52,9 +52,13 @@
         {% for schedule in schedules %}
             <article class="schedule-row">
                 <div>
-                    <span class="soft-tag">{{ schedule.date }}</span>
-                    <h3>{{ schedule.origin }} to {{ schedule.destination }}</h3>
-                    <p>Departure time: {{ schedule.departure_time }}</p>
+                    <span class="soft-tag">{{ schedule.schedule_label }}</span>
+                    <h3>{{ schedule.route_label }}</h3>
+                    <p>{{ schedule.origin }} to {{ schedule.destination }}</p>
+                    <p>
+                        Departure: {{ schedule.departure_time }}
+                        {% if schedule.return_time %}| Return: {{ schedule.return_time }}{% endif %}
+                    </p>
                 </div>
                 <div class="schedule-meta">
                     <strong>{{ schedule.available_seats }} seats left</strong>

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout Confirmation | Maavaharu{% endblock %}
+
+{% block content %}
+<section class="checkout-hero">
+    <div>
+        <p class="hero-kicker">Confirmation screen</p>
+        <h1>Confirm Your Checkout</h1>
+        <p>Check your booking and ticket details before moving to payment.</p>
+    </div>
+</section>
+
+<section class="checkout-layout">
+    <div class="checkout-list">
+        {% for item in cart_items %}
+            <article class="checkout-row">
+                <div>
+                    <span class="soft-tag">{{ item.type|title }}</span>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description }}</p>
+                </div>
+                <div class="checkout-meta">
+                    <strong>MVR {{ item.total }}</strong>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+
+    <aside class="checkout-summary-card">
+        <h2>Amount To Pay</h2>
+        <p>Mock payment for project checkout flow.</p>
+        <strong>MVR {{ cart_total }}</strong>
+        <a href="{% url 'payment' %}" class="booking-submit checkout-link">Proceed To Payment</a>
+        <a href="{% url 'cart' %}" class="checkout-secondary-link">Back to cart</a>
+    </aside>
+</section>
+{% endblock %}
