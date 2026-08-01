@@ -35,20 +35,28 @@ class MockPaymentForm(forms.Form):
 class AdvertisementForm(forms.ModelForm):
     class Meta:
         model = Advertisement
-        fields = ('title', 'content', 'image_url', 'is_active')
+        fields = ('title', 'content', 'image', 'image_url', 'is_active')
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4}),
         }
+        labels = {
+            'image_url': 'Image URL (optional fallback)',
+            'is_active': 'Show on homepage',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image_url'].required = False
 
 
 class MapLocationForm(forms.ModelForm):
     class Meta:
         model = MapLocation
-        fields = ('name', 'category', 'description', 'latitude', 'longitude', 'pin_x', 'pin_y')
+        fields = ('name', 'category', 'description', 'image', 'latitude', 'longitude', 'pin_x', 'pin_y')
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
-            'pin_x': forms.NumberInput(attrs={'min': 0, 'max': 100, 'step': 0.1}),
-            'pin_y': forms.NumberInput(attrs={'min': 0, 'max': 100, 'step': 0.1}),
+            'pin_x': forms.NumberInput(attrs={'min': 0, 'max': 100, 'step': 0.1, 'placeholder': 50}),
+            'pin_y': forms.NumberInput(attrs={'min': 0, 'max': 100, 'step': 0.1, 'placeholder': 50}),
         }
         labels = {
             'pin_x': 'Pin X position (%)',
@@ -60,6 +68,27 @@ class MapLocationForm(forms.ModelForm):
             'pin_x': '0 is left side of the image, 100 is right side.',
             'pin_y': '0 is top of the image, 100 is bottom.',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pin_x'].required = False
+        self.fields['pin_y'].required = False
+
+    def clean_pin_x(self):
+        pin_x = self.cleaned_data.get('pin_x')
+        if pin_x is None:
+            return 50
+        if pin_x < 0 or pin_x > 100:
+            raise forms.ValidationError('Pin X must be between 0 and 100.')
+        return pin_x
+
+    def clean_pin_y(self):
+        pin_y = self.cleaned_data.get('pin_y')
+        if pin_y is None:
+            return 50
+        if pin_y < 0 or pin_y > 100:
+            raise forms.ValidationError('Pin Y must be between 0 and 100.')
+        return pin_y
 
 
 class MapImageForm(forms.ModelForm):
@@ -75,6 +104,31 @@ class SystemIssueForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
+
+
+class AdminUserCreateForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        help_text='Temporary password for the new account.',
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'username', 'email', 'phone', 'role', 'password',
+            'is_active', 'is_staff', 'is_superuser',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['is_active'].initial = True
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+        return user
 
 
 class AdminUserUpdateForm(forms.ModelForm):

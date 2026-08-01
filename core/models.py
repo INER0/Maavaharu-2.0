@@ -5,6 +5,7 @@ class Advertisement(models.Model):
     """Promotional banner/ad shown on the homepage. Managed by admin/staff."""
     title = models.CharField(max_length=200)
     content = models.TextField(blank=True)
+    image = models.ImageField(upload_to='advertisements/', blank=True)
     image_url = models.URLField(blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,6 +19,7 @@ class MapLocation(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='map_locations/', blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     pin_x = models.DecimalField(

@@ -102,6 +102,34 @@
                 </div>
             </div>
 
+            <section class="staff-grid flush-grid">
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Create account</p>
+                        <h3>New User Or Staff</h3>
+                    </div>
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create_user">
+                        {{ user_create_form.as_p }}
+                        <button type="submit">Create Account</button>
+                    </form>
+                </article>
+                <article class="staff-panel">
+                    <div class="staff-panel-heading">
+                        <p class="hero-kicker">Role guide</p>
+                        <h3>Access Levels</h3>
+                    </div>
+                    <div class="report-list">
+                        <p><strong>Visitor:</strong> can book hotel rooms and theme park tickets.</p>
+                        <p><strong>Hotel Manager:</strong> goes to hotel staff dashboard.</p>
+                        <p><strong>Ferry Operator:</strong> goes to ferry staff dashboard.</p>
+                        <p><strong>Theme Park Staff:</strong> goes to theme park staff dashboard.</p>
+                        <p><strong>Admin:</strong> goes to this system admin dashboard.</p>
+                    </div>
+                </article>
+            </section>
+
             <div class="staff-table-wrap">
                 <table class="staff-table">
                     <thead>
@@ -172,70 +200,78 @@
             <section class="staff-grid flush-grid">
                 <article class="staff-panel">
                     <div class="staff-panel-heading">
-                        <p class="hero-kicker">Add advertisement</p>
-                        <h3>New Promo Content</h3>
+                        <p class="hero-kicker">Create homepage ad</p>
+                        <h3>Add Advertisement</h3>
                     </div>
-                    <form method="post" class="staff-form">
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="add_advertisement">
                         {{ advertisement_form.as_p }}
-                        <button type="submit">Add Advertisement</button>
+                        <button type="submit" class="booking-submit">Add Advertisement</button>
                     </form>
                 </article>
                 <article class="staff-panel">
                     <div class="staff-panel-heading">
-                        <p class="hero-kicker">Homepage status</p>
-                        <h3>Active Content</h3>
+                        <p class="hero-kicker">Homepage content</p>
+                        <h3>How Ads Work</h3>
                     </div>
                     <div class="report-list">
-                        <p><strong>{{ active_ads_count }}</strong> active advertisement records are visible to visitors.</p>
-                        <p>Deactivate an ad when it should be hidden without deleting the record.</p>
+                        <p><strong>{{ active_ads_count }}</strong> active advertisement record(s) are visible to visitors.</p>
+                        <p>Upload an image for the homepage card, or use an image URL as a fallback.</p>
+                        <p>Deactivate an ad to hide it without deleting the record.</p>
                     </div>
                 </article>
             </section>
 
-            <div class="staff-table-wrap">
-                <table class="staff-table">
-                    <thead>
-                        <tr>
-                            <th>Advertisement</th>
-                            <th>Status</th>
-                            <th>Image URL</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ad in advertisements %}
-                            <tr>
-                                <td>
-                                    <strong>{{ ad.title }}</strong><br>
-                                    <small>{{ ad.content|default:"No description" }}</small>
-                                </td>
-                                <td>{% if ad.is_active %}Active{% else %}Hidden{% endif %}</td>
-                                <td>{{ ad.image_url|default:"No image URL" }}</td>
-                                <td>
-                                    <form method="post" class="inline-action-form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="toggle_advertisement">
-                                        <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
-                                        <button type="submit">{% if ad.is_active %}Hide{% else %}Activate{% endif %}</button>
-                                    </form>
-                                    <form method="post" class="inline-action-form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete_advertisement">
-                                        <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
-                                        <button type="submit">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4">No advertisements added yet.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Active content</p>
+                    <h2>Homepage Advertisements</h2>
+                </div>
+
+                <div class="staff-card-grid">
+                    {% for ad in advertisements %}
+                        <article class="staff-card promotion-card">
+                            <p class="staff-preview-label">Website preview</p>
+                            <div class="staff-site-preview">
+                                {% if ad.image %}
+                                    <div class="staff-thumb-row">
+                                        <img src="{{ ad.image.url }}" alt="{{ ad.title }}">
+                                    </div>
+                                {% elif ad.image_url %}
+                                    <div class="staff-thumb-row">
+                                        <img src="{{ ad.image_url }}" alt="{{ ad.title }}">
+                                    </div>
+                                {% endif %}
+                                {% if ad.is_active %}
+                                    <span class="soft-tag">Active</span>
+                                {% else %}
+                                    <span class="soft-tag">Hidden</span>
+                                {% endif %}
+                                <h3>{{ ad.title }}</h3>
+                                <p>{{ ad.content|default:"Homepage advertisement content." }}</p>
+                            </div>
+                            <form method="post" class="inline-action-form staff-card-action">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="toggle_advertisement">
+                                <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
+                                <button type="submit">{% if ad.is_active %}Hide Advertisement{% else %}Activate Advertisement{% endif %}</button>
+                            </form>
+                            <form method="post" class="inline-action-form staff-card-action">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_advertisement">
+                                <input type="hidden" name="advertisement_id" value="{{ ad.id }}">
+                                <button type="submit">Remove Advertisement</button>
+                            </form>
+                        </article>
+                    {% empty %}
+                        <article class="staff-card">
+                            <h3>No advertisements added yet</h3>
+                            <p>Add homepage ads using the advertisement form.</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
         {% endif %}
 
         {% if active_section == 'map' %}
@@ -265,7 +301,7 @@
                         <p class="hero-kicker">Add location</p>
                         <h3>Map Point</h3>
                     </div>
-                    <form method="post" class="staff-form">
+                    <form method="post" enctype="multipart/form-data" class="staff-form">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="add_location">
                         {{ map_location_form.as_p }}
@@ -281,6 +317,7 @@
                         <p>Hotel, ferry dock, beach, theme park gate, activity area, picnic point.</p>
                         <p>Latitude and longitude are shown to visitors. Pin X and Pin Y place the clickable icon on the uploaded image.</p>
                         <p><strong>Pin guide:</strong> X 0 is left, X 100 is right. Y 0 is top, Y 100 is bottom.</p>
+                        <p>Open the public map to use the visible 0-100 grid while adjusting pin positions.</p>
                     </div>
                 </article>
             </section>

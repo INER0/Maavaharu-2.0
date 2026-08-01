@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Maavaharu Booking System{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260727">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260801b">
     {% block styles %}{% endblock %}
 </head>
 <body>
@@ -28,6 +28,20 @@
 
     {% include 'includes/footer.html' %}
 
+    <script>
+        document.querySelectorAll('.message-stack .message').forEach((message) => {
+            window.setTimeout(() => {
+                message.classList.add('is-fading');
+                window.setTimeout(() => {
+                    message.remove();
+                    const stack = document.querySelector('.message-stack');
+                    if (stack && !stack.querySelector('.message')) {
+                        stack.remove();
+                    }
+                }, 1000);
+            }, 3500);
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

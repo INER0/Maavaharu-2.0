@@ -140,7 +140,7 @@
         {% for event in weekly_schedules %}
             <span>{{ event.schedule_label }}</span>
         {% empty %}
-            <span>No weekly schedules added yet</span>
+            <span>Weekly schedules coming soon</span>
         {% endfor %}
         {% for date in special_dates %}
             <span>Special event: {{ date }}</span>
@@ -183,8 +183,8 @@
             </article>
         {% empty %}
             <article class="park-empty-card">
-                <h3>No weekly activities yet</h3>
-                <p>Theme park staff can add weekly activities, shows, and recurring beach experiences.</p>
+                <h3>Weekly activities coming soon</h3>
+                <p>Recurring activities, shows, and beach experiences will be listed here.</p>
             </article>
         {% endfor %}
     </div>
@@ -225,8 +225,8 @@
             </article>
         {% empty %}
             <article class="park-empty-card">
-                <h3>No special events yet</h3>
-                <p>Special dated shows and festivals will appear here once theme park staff add them.</p>
+                <h3>Special events coming soon</h3>
+                <p>Limited-date shows and island festivals will be listed here.</p>
             </article>
         {% endfor %}
     </div>
@@ -235,7 +235,7 @@
 {% if promotions %}
 <section class="park-promotion-strip redesigned-promo-strip">
     <div class="section-title">
-        <p>Staff managed offers</p>
+        <p>Visitor offers</p>
         <h2>Activity Promotions</h2>
     </div>
     <div class="park-card-grid">
@@ -298,8 +298,8 @@
             </article>
         {% empty %}
             <article class="park-empty-card beach-card">
-                <h3>No beach events yet</h3>
-                <p>Theme park staff can add beach events from the staff dashboard.</p>
+                <h3>Beach events coming soon</h3>
+                <p>Sunset gatherings, beach games, and outdoor events will be listed here.</p>
             </article>
         {% endfor %}
     </div>
@@ -330,7 +330,7 @@
                 <article class="activity-row">
                     <div>
                         <h3>No entrance tickets yet</h3>
-                        <p>Your park admission tickets will appear here after purchase.</p>
+                        <p>Buy admission when you are ready to visit the theme park island.</p>
                     </div>
                 </article>
             {% endfor %}
@@ -353,7 +353,7 @@
                 <article class="activity-row">
                     <div>
                         <h3>No activity tickets yet</h3>
-                        <p>Your activity, show, and beach event tickets will appear here after purchase.</p>
+                        <p>Reserve an activity, show, or beach event to build your visit plan.</p>
                     </div>
                 </article>
             {% endfor %}

@@ -47,7 +47,7 @@ class WeeklyEventStaffForm(BaseEventStaffForm):
     )
     weekdays = forms.MultipleChoiceField(
         choices=Event.Weekday.choices,
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'weekday-checkbox-list'}),
         label='Weekdays',
     )
 
@@ -185,6 +185,21 @@ class EntranceTicketSaleForm(forms.ModelForm):
         if visit_date < timezone.now().date():
             raise forms.ValidationError('Visit date cannot be in the past.')
         return visit_date
+
+
+class ThemeParkBookingUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ThemeParkTicket
+        fields = ('quantity',)
+        widgets = {
+            'quantity': forms.NumberInput(attrs={'min': 1}),
+        }
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data['quantity']
+        if quantity < 1:
+            raise forms.ValidationError('Quantity must be at least 1.')
+        return quantity
 
 
 class ThemeParkEntranceTicketForm(forms.ModelForm):

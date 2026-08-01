@@ -20,14 +20,16 @@
 
 <section class="home-section">
     <div class="section-title">
-        <p>Staff-managed content</p>
+        <p>Island offers</p>
         <h2>Promotions</h2>
     </div>
 
     <div class="card-grid">
         {% for ad in advertisements %}
             <article class="island-card promo-card">
-                {% if ad.image_url %}
+                {% if ad.image %}
+                    <img src="{{ ad.image.url }}" alt="{{ ad.title }}">
+                {% elif ad.image_url %}
                     <img src="{{ ad.image_url }}" alt="{{ ad.title }}">
                 {% endif %}
                 <h3>{{ ad.title }}</h3>
@@ -35,8 +37,8 @@
             </article>
         {% empty %}
             <article class="island-card promo-card">
-                <h3>No advertisements yet</h3>
-                <p>Add active advertisements from the admin panel and they will appear here.</p>
+                <h3>New offers coming soon</h3>
+                <p>Check back for Maavaharu hotel, activity, and island experience offers.</p>
             </article>
         {% endfor %}
 
@@ -62,7 +64,7 @@
 
 <section class="home-section">
     <div class="section-title">
-        <p>Visitor services</p>
+        <p>Plan your visit</p>
         <h2>Book Your Island Journey</h2>
     </div>
 
@@ -92,7 +94,7 @@
 
 <section class="home-section">
     <div class="section-title">
-        <p>Managed by hotel staff</p>
+        <p>Island stay</p>
         <h2>Maavaharu Hotel</h2>
     </div>
 
@@ -106,8 +108,8 @@
             </article>
         {% empty %}
             <article class="island-card">
-                <h3>Maavaharu Hotel details not added yet</h3>
-                <p>Hotel staff can add Maavaharu Hotel rooms and details from the admin panel.</p>
+                <h3>Maavaharu Hotel details coming soon</h3>
+                <p>Room details and stay information will be available here soon.</p>
             </article>
         {% endfor %}
     </div>
@@ -115,7 +117,7 @@
 
 <section class="home-section">
     <div class="section-title">
-        <p>Managed by theme park staff</p>
+        <p>Theme park island</p>
         <h2>Upcoming Activities</h2>
     </div>
 
@@ -144,8 +146,8 @@
         {% empty %}
             <article class="activity-row">
                 <div>
-                    <h3>No activities added yet</h3>
-                    <p>Theme park staff can add activities, shows, and beach events for the nearby theme park island.</p>
+                    <h3>Activities coming soon</h3>
+                    <p>New shows, beach events, and island activities will be listed here.</p>
                 </div>
             </article>
         {% endfor %}
@@ -155,12 +157,12 @@
 <section class="home-section map-section">
     <div>
         <div class="section-title">
-            <p>Managed by admin</p>
+            <p>Island guide</p>
             <h2>Explore Maavaharu</h2>
         </div>
         <p class="map-copy">
-            Show Maavaharu Hotel, ferry docks, Picnic Island areas, theme park gates,
-            and visitor points from dynamic map location records.
+            Find Maavaharu Hotel, ferry docks, Picnic Island areas, theme park gates,
+            and useful visitor points.
         </p>
         <a href="{% url 'island_map' %}" class="hero-secondary">Open Island Map</a>
     </div>
@@ -173,8 +175,8 @@
             </article>
         {% empty %}
             <article>
-                <strong>No locations added yet</strong>
-                <span>Admin can add map locations from the admin panel.</span>
+                <strong>Map guide coming soon</strong>
+                <span>Visitor locations will be available here soon.</span>
             </article>
         {% endfor %}
     </div>

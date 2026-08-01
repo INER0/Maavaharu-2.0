@@ -283,6 +283,50 @@
     resize: vertical;
 }
 
+.staff-form input[type="checkbox"] {
+    accent-color: #20b7bd;
+    min-height: auto;
+    padding: 0;
+    width: auto;
+}
+
+.staff-form .weekday-checkbox-list,
+.staff-form p:has(.weekday-checkbox-list) {
+    display: grid;
+    gap: 10px;
+}
+
+.staff-form .weekday-checkbox-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+}
+
+.staff-form .weekday-checkbox-list li {
+    margin: 0;
+}
+
+.staff-form .weekday-checkbox-list label {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #cfe7e4;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+    justify-content: space-between;
+    min-height: 42px;
+    padding: 9px 12px;
+}
+
+.staff-form .weekday-checkbox-list label:has(input:checked) {
+    background: #e8f9f5;
+    border-color: #20b7bd;
+    color: #0b7183;
+}
+
 .staff-card-grid {
     display: grid;
     gap: 18px;

@@ -13,8 +13,8 @@ from hotels.models import Hotel, HotelBooking, HotelPromotion, Room
 from themepark.models import Event, ThemeParkEntranceTicket, ThemeParkTicket
 from .cart import cart_total, complete_checkout, get_cart, remove_item
 from .forms import (
-    AdminUserUpdateForm, AdvertisementForm, MapImageForm, MapLocationForm, MockPaymentForm,
-    SystemIssueForm,
+    AdminUserCreateForm, AdminUserUpdateForm, AdvertisementForm, MapImageForm,
+    MapLocationForm, MockPaymentForm, SystemIssueForm,
 )
 from .models import Advertisement, MapImage, MapLocation, SystemIssue
 from .serializers import AdvertisementSerializer, MapLocationSerializer
@@ -72,6 +72,7 @@ def system_admin_dashboard(request):
     map_images = MapImage.objects.all().order_by('-uploaded_at')
     issues = SystemIssue.objects.all().order_by('status', '-created_at')
 
+    user_create_form = AdminUserCreateForm()
     advertisement_form = AdvertisementForm()
     map_image_form = MapImageForm()
     map_location_form = MapLocationForm()
@@ -80,7 +81,15 @@ def system_admin_dashboard(request):
     if request.method == 'POST':
         action = request.POST.get('action')
 
-        if action == 'update_user':
+        if action == 'create_user':
+            active_section = 'users'
+            user_create_form = AdminUserCreateForm(request.POST)
+            if user_create_form.is_valid():
+                new_user = user_create_form.save()
+                messages.success(request, f'{new_user.username} account created.')
+                return admin_section_redirect('users')
+
+        elif action == 'update_user':
             active_section = 'users'
             user_record = User.objects.filter(id=request.POST.get('user_id')).first()
             if user_record:
@@ -102,7 +111,7 @@ def system_admin_dashboard(request):
 
         elif action == 'add_advertisement':
             active_section = 'content'
-            advertisement_form = AdvertisementForm(request.POST)
+            advertisement_form = AdvertisementForm(request.POST, request.FILES)
             if advertisement_form.is_valid():
                 advertisement_form.save()
                 messages.success(request, 'Homepage advertisement added.')
@@ -125,11 +134,12 @@ def system_admin_dashboard(request):
 
         elif action == 'add_location':
             active_section = 'map'
-            map_location_form = MapLocationForm(request.POST)
+            map_location_form = MapLocationForm(request.POST, request.FILES)
             if map_location_form.is_valid():
                 map_location_form.save()
                 messages.success(request, 'Map location added.')
                 return admin_section_redirect('map')
+            messages.error(request, 'Map location was not added. Please check the highlighted fields.')
 
         elif action == 'add_map_image':
             active_section = 'map'
@@ -140,6 +150,7 @@ def system_admin_dashboard(request):
                     MapImage.objects.exclude(id=map_image.id).update(is_active=False)
                 messages.success(request, 'Public island map image uploaded.')
                 return admin_section_redirect('map')
+            messages.error(request, 'Map image was not uploaded. Please choose a valid image file.')
 
         elif action == 'activate_map_image':
             active_section = 'map'
@@ -201,6 +212,7 @@ def system_admin_dashboard(request):
         'locations': locations,
         'map_images': map_images,
         'issues': issues,
+        'user_create_form': user_create_form,
         'advertisement_form': advertisement_form,
         'map_image_form': map_image_form,
         'map_location_form': map_location_form,

@@ -4,7 +4,7 @@
 {% block title %}Theme Park Staff | Maavaharu{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260723">
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260801">
 {% endblock %}
 
 {% block content %}
@@ -197,51 +197,160 @@
         {% if active_section == 'bookings' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Booking management for individual activities</p>
-                    <h2>Activity Booking Summary</h2>
+                    <p class="hero-kicker">Handle bookings for activities, shows, and beach events</p>
+                    <h2>Booking Management</h2>
                 </div>
             </div>
+
+            <section class="staff-summary management-summary">
+                <article>
+                    <span>{{ activity_booking_count }}</span>
+                    <p>Activity bookings</p>
+                </article>
+                <article>
+                    <span>{{ show_booking_count }}</span>
+                    <p>Show bookings</p>
+                </article>
+                <article>
+                    <span>{{ beach_booking_count }}</span>
+                    <p>Beach event bookings</p>
+                </article>
+                <article>
+                    <span>{{ online_tickets }}</span>
+                    <p>Online tickets</p>
+                </article>
+                <article>
+                    <span>{{ entrance_activity_tickets }}</span>
+                    <p>Entrance desk tickets</p>
+                </article>
+            </section>
+
+            <section class="staff-panel booking-filter-panel">
+                <div class="staff-panel-heading">
+                    <p class="hero-kicker">Filter bookings</p>
+                    <h3>Find Bookings</h3>
+                </div>
+                <form method="get" class="inline-status-form booking-filter-form">
+                    <input type="hidden" name="section" value="bookings">
+                    <select name="booking_event_type">
+                        <option value="">All activities, shows, and beach events</option>
+                        {% for value, label in event_type_choices %}
+                            <option value="{{ value }}"{% if booking_event_type == value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="booking_channel">
+                        <option value="">All channels</option>
+                        {% for value, label in channel_choices %}
+                            <option value="{{ value }}"{% if booking_channel == value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Apply</button>
+                    <a href="?section=bookings">Clear</a>
+                </form>
+            </section>
 
             <div class="staff-table-wrap">
                 <table class="staff-table">
                     <thead>
                         <tr>
-                            <th>Activity / Event</th>
+                            <th>Booking ID</th>
+                            <th>Guest</th>
+                            <th>Activity / Show / Beach Event</th>
                             <th>Type</th>
                             <th>Schedule</th>
-                            <th>Online bookings</th>
-                            <th>Entrance sales</th>
-                            <th>Total booked</th>
-                            <th>Visitors</th>
+                            <th>Channel</th>
+                            <th>Quantity</th>
                             <th>Remaining capacity</th>
+                            <th>Purchased</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for event in events %}
+                        {% for ticket in managed_bookings %}
                             <tr>
-                                <td>{{ event.name }}</td>
-                                <td>{{ event.get_event_type_display }}</td>
-                                <td>{{ event.schedule_label }}</td>
-                                <td>{{ event.online_booked }}</td>
-                                <td>{{ event.entrance_booked }}</td>
-                                <td>{{ event.booked_total }}</td>
-                                <td>{{ event.visitor_count }}</td>
+                                <td>{{ ticket.verification_code }}</td>
+                                <td>{{ ticket.visitor.username|default:"Entrance guest" }}</td>
+                                <td>{{ ticket.event.name }}</td>
+                                <td>{{ ticket.event.get_event_type_display }}</td>
+                                <td>{{ ticket.event.schedule_label }}</td>
+                                <td>{{ ticket.get_channel_display }}</td>
                                 <td>
-                                    {% if event.available_capacity is not None %}
-                                        {{ event.available_capacity }}
+                                    <form method="post" class="inline-status-form booking-quantity-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update_activity_booking">
+                                        <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                                        <input type="number" name="quantity" value="{{ ticket.quantity }}" min="1">
+                                        <button type="submit">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    {% if ticket.event.available_capacity is not None %}
+                                        {{ ticket.event.available_capacity }}
                                     {% else %}
                                         No set limit
                                     {% endif %}
                                 </td>
+                                <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <form method="post" class="inline-action-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="cancel_activity_booking">
+                                        <input type="hidden" name="ticket_id" value="{{ ticket.id }}">
+                                        <button type="submit">Cancel</button>
+                                    </form>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="8">No activity bookings to manage yet.</td>
+                                <td colspan="10">No activity, show, or beach event bookings found.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            <section class="staff-section in-management">
+                <div class="section-title booking-title">
+                    <p>Event booking summary</p>
+                    <h2>Capacity By Activity</h2>
+                </div>
+                <div class="staff-table-wrap">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Activity / Event</th>
+                                <th>Type</th>
+                                <th>Online bookings</th>
+                                <th>Entrance sales</th>
+                                <th>Total booked</th>
+                                <th>Remaining capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td>{{ event.name }}</td>
+                                    <td>{{ event.get_event_type_display }}</td>
+                                    <td>{{ event.online_booked }}</td>
+                                    <td>{{ event.entrance_booked }}</td>
+                                    <td>{{ event.booked_total }}</td>
+                                    <td>
+                                        {% if event.available_capacity is not None %}
+                                            {{ event.available_capacity }}
+                                        {% else %}
+                                            No set limit
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">No events added yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         {% endif %}
 
         {% if active_section == 'tickets' %}

@@ -4,8 +4,8 @@ from uuid import uuid4
 
 from django.db import transaction
 
-from hotels.models import HotelBooking, Room
-from themepark.models import Event, ThemeParkEntranceTicket, ThemeParkTicket
+from hotels.models import HotelBooking, HotelPromotion, Room
+from themepark.models import Event, ThemeParkEntranceTicket, ThemeParkPromotion, ThemeParkTicket
 
 
 ENTRANCE_TICKET_PRICE = Decimal('100.00')
@@ -13,6 +13,32 @@ ENTRANCE_TICKET_PRICE = Decimal('100.00')
 
 def _money(value):
     return f'{Decimal(value):.2f}'
+
+
+def _discounted_total(original_total, promotion):
+    original_total = Decimal(original_total)
+    if not promotion or not promotion.discount_percent:
+        return original_total, Decimal('0.00')
+
+    discount_amount = original_total * Decimal(promotion.discount_percent) / Decimal('100')
+    total = max(original_total - discount_amount, Decimal('0.00'))
+    return total, discount_amount
+
+
+def _best_hotel_discount(room):
+    return HotelPromotion.objects.filter(
+        hotel=room.hotel,
+        discount_percent__isnull=False,
+        valid_until__gte=date.today(),
+    ).order_by('-discount_percent', 'valid_until').first()
+
+
+def _best_event_discount(event):
+    return ThemeParkPromotion.objects.filter(
+        event=event,
+        discount_percent__isnull=False,
+        valid_until__gte=date.today(),
+    ).order_by('-discount_percent', 'valid_until').first()
 
 
 def get_cart(request):
@@ -54,12 +80,18 @@ def add_hotel_booking(request, cleaned_data):
     check_out = cleaned_data['check_out']
     nights = max((check_out - check_in).days, 1)
     num_rooms = cleaned_data['num_rooms']
-    total = room.price_per_night * num_rooms * nights
+    original_total = room.price_per_night * num_rooms * nights
+    promotion = _best_hotel_discount(room)
+    total, discount_amount = _discounted_total(original_total, promotion)
 
     add_item(request, {
         'type': 'hotel',
         'title': f'{room.room_type} room booking',
         'description': f'{check_in} to {check_out}, {num_rooms} room(s), {nights} night(s)',
+        'original_total': _money(original_total),
+        'discount_percent': promotion.discount_percent if promotion else None,
+        'discount_amount': _money(discount_amount),
+        'promotion_title': promotion.title if promotion else '',
         'total': _money(total),
         'payload': {
             'room_id': room.id,
@@ -93,12 +125,18 @@ def add_entrance_ticket(request, cleaned_data):
 def add_themepark_ticket(request, cleaned_data):
     event = cleaned_data['event']
     quantity = cleaned_data['quantity']
-    total = event.price * quantity
+    original_total = event.price * quantity
+    promotion = _best_event_discount(event)
+    total, discount_amount = _discounted_total(original_total, promotion)
 
     add_item(request, {
         'type': 'activity',
         'title': event.name,
         'description': f'{event.get_event_type_display()} | {event.schedule_label} | {quantity} ticket(s)',
+        'original_total': _money(original_total),
+        'discount_percent': promotion.discount_percent if promotion else None,
+        'discount_amount': _money(discount_amount),
+        'promotion_title': promotion.title if promotion else '',
         'total': _money(total),
         'payload': {
             'event_id': event.id,

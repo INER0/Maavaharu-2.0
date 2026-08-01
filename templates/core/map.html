@@ -3,120 +3,137 @@
 {% block title %}Island Map | Maavaharu{% endblock %}
 
 {% block content %}
-<section class="map-hero-page">
-    <div>
-        <p class="hero-kicker">Island locations</p>
-        <h1>Explore Maavaharu And Nearby Islands</h1>
-        <p>
-            View key visitor locations including Maavaharu Hotel, ferry docks,
-            Picnic Island areas, beach activity zones, and the planned theme park island.
-        </p>
-    </div>
-</section>
+<main class="simple-map-page">
+    <section class="simple-map-header">
+        <div>
+            <p class="hero-kicker">Island map</p>
+            <h1>Maavaharu Map</h1>
+            <p>Click a pin to view its name, details, latitude, longitude, and image position.</p>
+        </div>
+        <a class="hero-secondary" href="{% url 'home' %}">Back Home</a>
+    </section>
 
-<section class="interactive-map-section">
-    <div class="zoom-map-shell">
-        <div class="zoom-map-toolbar" aria-label="Map zoom controls">
-            <button type="button" data-map-zoom="out">-</button>
-            <button type="button" data-map-zoom="reset">Reset</button>
-            <button type="button" data-map-zoom="in">+</button>
+    <section class="simple-map-layout">
+        <div class="simple-map-card">
+            <div class="simple-map-tools">
+                <div class="zoom-map-toolbar compact-toolbar" aria-label="Map zoom controls">
+                    <button type="button" data-map-zoom="out">-</button>
+                    <button type="button" data-map-zoom="reset">Reset</button>
+                    <button type="button" data-map-zoom="in">+</button>
+                </div>
+                <label class="grid-toggle">
+                    <input type="checkbox" id="gridToggle">
+                    Show 0-100 guide
+                </label>
+            </div>
+
+            <div class="simple-map-frame">
+                <div class="simple-map-axis simple-map-axis-x" aria-hidden="true">
+                    <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+                </div>
+                <div class="simple-map-axis simple-map-axis-y" aria-hidden="true">
+                    <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+                </div>
+
+                <div class="zoom-map-viewport simple-map-viewport" id="zoomMapViewport">
+                    {% if map_image %}
+                        <img id="zoomMapImage" src="{{ map_image.image.url }}" alt="{{ map_image.title }}" draggable="false">
+                        <div class="map-coordinate-grid clean-coordinate-grid" id="mapCoordinateGrid" aria-hidden="true"></div>
+                        <div class="map-pin-layer" id="mapPinLayer">
+                            {% for location in locations %}
+                                <button
+                                    type="button"
+                                    class="image-map-pin"
+                                    style="left: {{ location.pin_x }}%; top: {{ location.pin_y }}%;"
+                                    data-location-id="{{ location.id }}"
+                                    data-name="{{ location.name }}"
+                                    data-category="{{ location.category|default:'Island location' }}"
+                                    data-description="{{ location.description|default:'Location details can be updated by admin.' }}"
+                                    data-image="{% if location.image %}{{ location.image.url }}{% endif %}"
+                                    data-latitude="{{ location.latitude }}"
+                                    data-longitude="{{ location.longitude }}"
+                                    data-pin-x="{{ location.pin_x }}"
+                                    data-pin-y="{{ location.pin_y }}"
+                                    aria-label="Show {{ location.name }} on map"
+                                >
+                                    <span></span>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="island-map-visual fallback-map-visual">
+                            <div class="map-water-ring"></div>
+                            <div class="map-island-shape">
+                                <span class="map-pin hotel-pin">Hotel</span>
+                                <span class="map-pin ferry-pin">Ferry</span>
+                                <span class="map-pin beach-pin">Beach</span>
+                                <span class="map-pin park-pin">Park</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <div class="zoom-map-viewport" id="zoomMapViewport">
-            {% if map_image %}
-                <img
-                    id="zoomMapImage"
-                    src="{{ map_image.image.url }}"
-                    alt="{{ map_image.title }}"
-                    draggable="false"
-                >
-                <div class="map-pin-layer" id="mapPinLayer">
-                    {% for location in locations %}
-                        <button
-                            type="button"
-                            class="image-map-pin"
-                            style="left: {{ location.pin_x }}%; top: {{ location.pin_y }}%;"
-                            data-name="{{ location.name }}"
-                            data-category="{{ location.category|default:'Island location' }}"
-                            data-description="{{ location.description|default:'Location details can be updated by admin.' }}"
-                            data-latitude="{{ location.latitude }}"
-                            data-longitude="{{ location.longitude }}"
-                            aria-label="Show {{ location.name }} on map"
-                        >
-                            <span></span>
-                        </button>
-                    {% endfor %}
-                </div>
-                <article class="map-pin-popup" id="mapPinPopup" hidden>
-                    <span class="soft-tag" data-popup-category></span>
-                    <h3 data-popup-name></h3>
-                    <p data-popup-description></p>
-                    <div class="coordinate-row">
-                        <span data-popup-latitude></span>
-                        <span data-popup-longitude></span>
-                    </div>
-                </article>
-            {% else %}
-                <div class="island-map-visual fallback-map-visual">
-                    <div class="map-water-ring"></div>
-                    <div class="map-island-shape">
-                        <span class="map-pin hotel-pin">Hotel</span>
-                        <span class="map-pin ferry-pin">Ferry</span>
-                        <span class="map-pin beach-pin">Beach</span>
-                        <span class="map-pin park-pin">Park</span>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
+        <aside class="simple-location-panel">
+            <div class="selected-location-image empty" id="selectedMapImage">
+                <span>Choose a pin</span>
+            </div>
+            <p class="hero-kicker">Location details</p>
+            <h2 id="selectedMapName">Choose a pin</h2>
+            <p id="selectedMapDescription">Select a map pin or choose a location below to see what is there.</p>
+            <div class="simple-detail-list">
+                <p><span>Type of place</span><strong id="selectedMapCategory">-</strong></p>
+                <p><span>Map coordinates</span><strong><span id="selectedMapLatitude">-</span>, <span id="selectedMapLongitude">-</span></strong></p>
+                <p><span>Pin placement</span><strong id="selectedMapPin">X -, Y -</strong></p>
+            </div>
 
-    <div class="map-guide-panel">
-        <p class="hero-kicker">How to read this map</p>
-        <h2>Visitor Guide</h2>
-        <p>
-            Admin can maintain official map locations from the admin panel.
-            Visitors can use this page to understand where services and attractions are placed.
-        </p>
-        <div class="map-legend">
-            <span><i class="legend-dot hotel"></i> Hotel</span>
-            <span><i class="legend-dot ferry"></i> Ferry dock</span>
-            <span><i class="legend-dot beach"></i> Beach area</span>
-            <span><i class="legend-dot park"></i> Theme park</span>
-        </div>
-    </div>
-</section>
-
-<section class="home-section">
-    <div class="section-title">
-        <p>Managed by admin</p>
-        <h2>Map Locations</h2>
-    </div>
-
-    <div class="location-card-grid">
-        {% for location in locations %}
-            <article class="map-location-card">
-                <span class="soft-tag">{{ location.category|default:"Island location" }}</span>
-                <h3>{{ location.name }}</h3>
-                <p>{{ location.description|default:"Location details can be updated by admin." }}</p>
-                <div class="coordinate-row">
-                    <span>Lat {{ location.latitude }}</span>
-                    <span>Lng {{ location.longitude }}</span>
-                </div>
-            </article>
-        {% empty %}
-            <article class="map-location-card">
-                <h3>No map locations added yet</h3>
-                <p>Admin can add Maavaharu Hotel, ferry docks, beaches, theme park gates, and visitor points from the admin panel.</p>
-            </article>
-        {% endfor %}
-    </div>
-</section>
+            <div class="simple-location-list">
+                {% for location in locations %}
+                    <button
+                        type="button"
+                        class="simple-location-button"
+                        data-location-trigger="{{ location.id }}"
+                        data-name="{{ location.name }}"
+                        data-category="{{ location.category|default:'Island location' }}"
+                        data-description="{{ location.description|default:'Location details can be updated by admin.' }}"
+                        data-image="{% if location.image %}{{ location.image.url }}{% endif %}"
+                        data-latitude="{{ location.latitude }}"
+                        data-longitude="{{ location.longitude }}"
+                        data-pin-x="{{ location.pin_x }}"
+                        data-pin-y="{{ location.pin_y }}"
+                    >
+                        {% if location.image %}
+                            <img src="{{ location.image.url }}" alt="{{ location.name }}">
+                        {% else %}
+                            <span class="location-thumb-placeholder">{{ location.name|first }}</span>
+                        {% endif %}
+                        <span>
+                            <strong>{{ location.name }}</strong>
+                            <small>{{ location.category|default:"Island location" }}</small>
+                        </span>
+                    </button>
+                {% empty %}
+                    <p class="empty-map-note">Map locations coming soon.</p>
+                {% endfor %}
+            </div>
+        </aside>
+    </section>
+</main>
 
 <script>
     const viewport = document.getElementById('zoomMapViewport');
     const image = document.getElementById('zoomMapImage');
     const pinLayer = document.getElementById('mapPinLayer');
-    const popup = document.getElementById('mapPinPopup');
+    const coordinateGrid = document.getElementById('mapCoordinateGrid');
+    const gridToggle = document.getElementById('gridToggle');
+    const selectedName = document.getElementById('selectedMapName');
+    const selectedCategory = document.getElementById('selectedMapCategory');
+    const selectedDescription = document.getElementById('selectedMapDescription');
+    const selectedLatitude = document.getElementById('selectedMapLatitude');
+    const selectedLongitude = document.getElementById('selectedMapLongitude');
+    const selectedPin = document.getElementById('selectedMapPin');
+    const selectedImage = document.getElementById('selectedMapImage');
 
     if (viewport && image) {
         let scale = 1;
@@ -127,13 +144,10 @@
         let startY = 0;
 
         function renderMap() {
-            image.style.transform = `translate(${positionX}px, ${positionY}px) scale(${scale})`;
-            if (pinLayer) {
-                pinLayer.style.transform = `translate(${positionX}px, ${positionY}px) scale(${scale})`;
-            }
-            if (popup && !popup.hidden) {
-                popup.hidden = true;
-            }
+            const transform = `translate(${positionX}px, ${positionY}px) scale(${scale})`;
+            image.style.transform = transform;
+            if (pinLayer) pinLayer.style.transform = transform;
+            if (coordinateGrid) coordinateGrid.style.transform = transform;
         }
 
         function setScale(nextScale) {
@@ -145,14 +159,40 @@
             renderMap();
         }
 
+        function selectLocation(source) {
+            selectedName.textContent = source.dataset.name;
+            selectedCategory.textContent = source.dataset.category;
+            selectedDescription.textContent = source.dataset.description;
+            selectedLatitude.textContent = source.dataset.latitude;
+            selectedLongitude.textContent = source.dataset.longitude;
+            selectedPin.textContent = `X ${source.dataset.pinX}, Y ${source.dataset.pinY}`;
+
+            if (selectedImage) {
+                if (source.dataset.image) {
+                    selectedImage.innerHTML = `<img src="${source.dataset.image}" alt="${source.dataset.name}">`;
+                    selectedImage.classList.remove('empty');
+                } else {
+                    selectedImage.innerHTML = '<span>Photo coming soon</span>';
+                    selectedImage.classList.add('empty');
+                }
+            }
+
+            document.querySelectorAll('.image-map-pin, .simple-location-button').forEach((item) => {
+                item.classList.remove('active');
+            });
+
+            const id = source.dataset.locationId || source.dataset.locationTrigger;
+            document.querySelectorAll(`[data-location-id="${id}"], [data-location-trigger="${id}"]`).forEach((item) => {
+                item.classList.add('active');
+            });
+        }
+
         document.querySelectorAll('[data-map-zoom]').forEach((button) => {
             button.addEventListener('click', () => {
                 const action = button.dataset.mapZoom;
-                if (action === 'in') {
-                    setScale(scale + 0.25);
-                } else if (action === 'out') {
-                    setScale(scale - 0.25);
-                } else {
+                if (action === 'in') setScale(scale + 0.25);
+                if (action === 'out') setScale(scale - 0.25);
+                if (action === 'reset') {
                     scale = 1;
                     positionX = 0;
                     positionY = 0;
@@ -161,15 +201,20 @@
             });
         });
 
+        if (gridToggle && coordinateGrid) {
+            gridToggle.addEventListener('change', () => {
+                coordinateGrid.classList.toggle('visible', gridToggle.checked);
+                document.querySelector('.simple-map-frame').classList.toggle('show-axis', gridToggle.checked);
+            });
+        }
+
         viewport.addEventListener('wheel', (event) => {
             event.preventDefault();
             setScale(scale + (event.deltaY < 0 ? 0.15 : -0.15));
         }, { passive: false });
 
         viewport.addEventListener('pointerdown', (event) => {
-            if (scale <= 1) {
-                return;
-            }
+            if (event.target.closest('.image-map-pin') || scale <= 1) return;
             isDragging = true;
             viewport.setPointerCapture(event.pointerId);
             startX = event.clientX - positionX;
@@ -177,48 +222,17 @@
         });
 
         viewport.addEventListener('pointermove', (event) => {
-            if (!isDragging) {
-                return;
-            }
+            if (!isDragging) return;
             positionX = event.clientX - startX;
             positionY = event.clientY - startY;
             renderMap();
         });
 
-        viewport.addEventListener('pointerup', () => {
-            isDragging = false;
-        });
+        viewport.addEventListener('pointerup', () => { isDragging = false; });
+        viewport.addEventListener('pointercancel', () => { isDragging = false; });
 
-        viewport.addEventListener('pointercancel', () => {
-            isDragging = false;
-        });
-
-        document.querySelectorAll('.image-map-pin').forEach((pin) => {
-            pin.addEventListener('click', (event) => {
-                event.stopPropagation();
-                if (!popup) {
-                    return;
-                }
-
-                popup.querySelector('[data-popup-category]').textContent = pin.dataset.category;
-                popup.querySelector('[data-popup-name]').textContent = pin.dataset.name;
-                popup.querySelector('[data-popup-description]').textContent = pin.dataset.description;
-                popup.querySelector('[data-popup-latitude]').textContent = `Lat ${pin.dataset.latitude}`;
-                popup.querySelector('[data-popup-longitude]').textContent = `Lng ${pin.dataset.longitude}`;
-
-                popup.style.left = pin.style.left;
-                popup.style.top = pin.style.top;
-                popup.hidden = false;
-            });
-        });
-
-        viewport.addEventListener('click', (event) => {
-            if (event.target.closest('.image-map-pin') || event.target.closest('.map-pin-popup')) {
-                return;
-            }
-            if (popup) {
-                popup.hidden = true;
-            }
+        document.querySelectorAll('.image-map-pin, .simple-location-button').forEach((item) => {
+            item.addEventListener('click', () => selectLocation(item));
         });
     }
 </script>

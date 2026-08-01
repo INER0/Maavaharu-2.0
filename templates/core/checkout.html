@@ -21,6 +21,11 @@
                     <p>{{ item.description }}</p>
                 </div>
                 <div class="checkout-meta">
+                    {% if item.discount_percent %}
+                        <span class="checkout-discount">{{ item.promotion_title }}: {{ item.discount_percent }}% off</span>
+                        <small>Before: MVR {{ item.original_total }}</small>
+                        <small>Saved: MVR {{ item.discount_amount }}</small>
+                    {% endif %}
                     <strong>MVR {{ item.total }}</strong>
                 </div>
             </article>

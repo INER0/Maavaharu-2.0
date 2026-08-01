@@ -13,7 +13,7 @@ from core.cart import add_entrance_ticket, add_themepark_ticket
 from .forms import (
     ActivityTicketSaleForm, EntranceTicketSaleForm, EventCapacityForm, SpecialEventStaffForm,
     ThemeParkEntranceTicketForm, ThemeParkPromotionForm, ThemeParkTicketForm,
-    TicketValidationForm,
+    ThemeParkBookingUpdateForm, TicketValidationForm,
     WeeklyEventStaffForm,
 )
 from .models import (
@@ -149,6 +149,13 @@ def themepark_staff_dashboard(request):
     tickets = ThemeParkTicket.objects.select_related('visitor', 'event').order_by('-purchased_at')
     entrance_tickets = ThemeParkEntranceTicket.objects.select_related('visitor').order_by('-purchased_at')
     promotions = ThemeParkPromotion.objects.select_related('event').order_by('valid_until')
+    booking_event_type = request.GET.get('booking_event_type', '')
+    booking_channel = request.GET.get('booking_channel', '')
+    managed_bookings = tickets
+    if booking_event_type in dict(Event.EventType.choices):
+        managed_bookings = managed_bookings.filter(event__event_type=booking_event_type)
+    if booking_channel in dict(ThemeParkTicket.Channel.choices):
+        managed_bookings = managed_bookings.filter(channel=booking_channel)
 
     weekly_event_form = WeeklyEventStaffForm()
     special_event_form = SpecialEventStaffForm()
@@ -199,6 +206,43 @@ def themepark_staff_dashboard(request):
                 event.delete()
                 messages.success(request, 'Theme park event removed.')
                 return staff_section_redirect('schedule')
+
+        elif action == 'update_activity_booking':
+            active_section = 'bookings'
+            ticket = ThemeParkTicket.objects.select_related('event').filter(id=request.POST.get('ticket_id')).first()
+            if ticket:
+                old_quantity = ticket.quantity
+                booking_form = ThemeParkBookingUpdateForm(request.POST, instance=ticket)
+                if booking_form.is_valid():
+                    new_quantity = booking_form.cleaned_data['quantity']
+                    difference = new_quantity - old_quantity
+                    event = ticket.event
+                    if event.available_capacity is not None and difference > event.available_capacity:
+                        messages.error(request, f'Only {event.available_capacity} extra spot(s) are available for {event.name}.')
+                        return staff_section_redirect('bookings')
+                    ticket = booking_form.save()
+                    if event.available_capacity is not None:
+                        event.available_capacity -= difference
+                        if event.capacity is not None:
+                            event.available_capacity = min(event.available_capacity, event.capacity)
+                        event.save()
+                    messages.success(request, 'Activity booking quantity updated.')
+                    return staff_section_redirect('bookings')
+                messages.error(request, 'Booking was not updated. Enter a valid quantity.')
+
+        elif action == 'cancel_activity_booking':
+            active_section = 'bookings'
+            ticket = ThemeParkTicket.objects.select_related('event').filter(id=request.POST.get('ticket_id')).first()
+            if ticket:
+                event = ticket.event
+                if event.available_capacity is not None:
+                    event.available_capacity += ticket.quantity
+                    if event.capacity is not None:
+                        event.available_capacity = min(event.available_capacity, event.capacity)
+                    event.save()
+                ticket.delete()
+                messages.success(request, 'Activity booking cancelled and capacity restored.')
+                return staff_section_redirect('bookings')
 
         elif action == 'sell_activity_ticket':
             active_section = 'tickets'
@@ -340,6 +384,9 @@ def themepark_staff_dashboard(request):
     total_revenue = activity_revenue + entrance_revenue
     unique_online_visitors = tickets.filter(visitor__isnull=False).values('visitor').distinct().count()
     unique_entrance_visitors = entrance_tickets.filter(visitor__isnull=False).values('visitor').distinct().count()
+    activity_booking_count = tickets.filter(event__event_type=Event.EventType.ACTIVITY).aggregate(total=Sum('quantity'))['total'] or 0
+    show_booking_count = tickets.filter(event__event_type=Event.EventType.SHOW).aggregate(total=Sum('quantity'))['total'] or 0
+    beach_booking_count = tickets.filter(event__event_type=Event.EventType.BEACH).aggregate(total=Sum('quantity'))['total'] or 0
 
     return render(request, 'themepark/staff_dashboard.html', {
         'weekly_event_form': weekly_event_form,
@@ -355,6 +402,11 @@ def themepark_staff_dashboard(request):
         'weekly_events': weekly_events,
         'special_events': special_events,
         'tickets': tickets,
+        'managed_bookings': managed_bookings,
+        'booking_event_type': booking_event_type,
+        'booking_channel': booking_channel,
+        'event_type_choices': Event.EventType.choices,
+        'channel_choices': ThemeParkTicket.Channel.choices,
         'entrance_tickets': entrance_tickets,
         'promotions': promotions,
         'upcoming_event_count': len(upcoming_events),
@@ -369,6 +421,9 @@ def themepark_staff_dashboard(request):
         'total_revenue': total_revenue,
         'unique_online_visitors': unique_online_visitors,
         'unique_entrance_visitors': unique_entrance_visitors,
+        'activity_booking_count': activity_booking_count,
+        'show_booking_count': show_booking_count,
+        'beach_booking_count': beach_booking_count,
     })
 
 
