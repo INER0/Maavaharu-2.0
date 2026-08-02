@@ -593,12 +593,14 @@
 }
 
 .staff-table-wrap {
+    max-width: 100%;
     overflow-x: auto;
+    padding-bottom: 6px;
 }
 
 .staff-table {
     border-collapse: collapse;
-    min-width: 860px;
+    min-width: 1040px;
     width: 100%;
 }
 
@@ -608,19 +610,29 @@
     color: #42606a;
     padding: 14px;
     text-align: left;
+    vertical-align: top;
 }
 
 .staff-table th {
     color: #173f4a;
     font-size: 13px;
     text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.staff-table td:last-child,
+.staff-table td:has(.inline-status-form),
+.staff-table td:has(.compact-form),
+.staff-table td:has(.inline-action-form) {
+    min-width: 170px;
 }
 
 .inline-status-form {
     align-items: center;
     display: grid;
     gap: 8px;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(130px, 1fr) auto;
+    min-width: 210px;
 }
 
 .inline-status-form input {
@@ -643,6 +655,7 @@
     font-weight: 800;
     min-height: 40px;
     padding: 8px 14px;
+    white-space: nowrap;
 }
 
 .inline-action-form button {
@@ -654,6 +667,23 @@
     font-weight: 800;
     min-height: 40px;
     padding: 8px 14px;
+    white-space: nowrap;
+}
+
+.compact-form {
+    min-width: 240px;
+}
+
+.compact-form button {
+    background: #20b7bd;
+    border: 0;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 800;
+    min-height: 40px;
+    padding: 8px 14px;
+    width: 100%;
 }
 
 .staff-card-action {
