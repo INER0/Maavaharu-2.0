@@ -247,10 +247,18 @@ class TicketValidationForm(forms.Form):
     verification_code = forms.CharField(
         label='Verification ID',
         widget=forms.TextInput(attrs={'placeholder': 'Paste ticket UUID'}),
+        required=False,
+    )
+    username = forms.CharField(
+        label='Or search visitor name/username',
+        widget=forms.TextInput(attrs={'placeholder': 'Customer username or name'}),
+        required=False,
     )
 
     def clean_verification_code(self):
-        value = self.cleaned_data['verification_code'].strip()
+        value = self.cleaned_data.get('verification_code', '').strip()
+        if not value:
+            return ''
         match = re.search(
             r'[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}',
             value,
@@ -259,6 +267,15 @@ class TicketValidationForm(forms.Form):
             raise forms.ValidationError('Paste a valid UUID verification ID.')
         raw_uuid = match.group(0).replace('-', '')
         return f'{raw_uuid[0:8]}-{raw_uuid[8:12]}-{raw_uuid[12:16]}-{raw_uuid[16:20]}-{raw_uuid[20:32]}'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        verification_code = cleaned_data.get('verification_code')
+        username = cleaned_data.get('username', '').strip()
+        if not verification_code and not username:
+            raise forms.ValidationError('Enter a verification ID or visitor name/username.')
+        cleaned_data['username'] = username
+        return cleaned_data
 
 
 class ThemeParkTicketForm(forms.ModelForm):

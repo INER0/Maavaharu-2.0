@@ -165,6 +165,7 @@ def themepark_staff_dashboard(request):
     validation_form = TicketValidationForm()
     validation_result = None
     validation_error = ''
+    validation_matches = []
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -311,8 +312,25 @@ def themepark_staff_dashboard(request):
             if validation_form.is_valid():
                 ticket_type = validation_form.cleaned_data['ticket_type']
                 verification_code = validation_form.cleaned_data['verification_code']
+                username = validation_form.cleaned_data.get('username')
 
-                if ticket_type == 'activity':
+                if username and ticket_type == 'activity':
+                    validation_matches = ThemeParkTicket.objects.select_related('visitor', 'event').filter(
+                        Q(visitor__username__icontains=username)
+                        | Q(visitor__first_name__icontains=username)
+                        | Q(visitor__last_name__icontains=username)
+                    ).order_by('-purchased_at')[:20]
+                    if not validation_matches:
+                        validation_error = f'No activity, show, or beach event tickets found for visitor "{username}".'
+                elif username:
+                    validation_matches = ThemeParkEntranceTicket.objects.select_related('visitor').filter(
+                        Q(visitor__username__icontains=username)
+                        | Q(visitor__first_name__icontains=username)
+                        | Q(visitor__last_name__icontains=username)
+                    ).order_by('-purchased_at')[:20]
+                    if not validation_matches:
+                        validation_error = f'No entrance tickets found for visitor "{username}".'
+                elif ticket_type == 'activity':
                     ticket = ThemeParkTicket.objects.select_related('visitor', 'event').filter(
                         verification_code=verification_code
                     ).first()
@@ -397,6 +415,7 @@ def themepark_staff_dashboard(request):
         'validation_form': validation_form,
         'validation_result': validation_result,
         'validation_error': validation_error,
+        'validation_matches': validation_matches,
         'active_section': active_section,
         'events': events,
         'weekly_events': weekly_events,

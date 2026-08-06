@@ -4,7 +4,7 @@
 {% block title %}Theme Park Staff | Maavaharu{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260802">
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260806b">
 {% endblock %}
 
 {% block content %}
@@ -13,8 +13,8 @@
         <p class="hero-kicker">Theme park operations</p>
         <h1>Theme Park Management</h1>
         <p>
-            Manage schedules, ticket sales, capacity, visitor bookings,
-            promotions, reports, and on-site validation from one staff console.
+            Manage schedules, ticket sales, available spots, visitor bookings,
+            promotions, reports, and ticket checks from one staff console.
         </p>
     </div>
 </section>
@@ -44,7 +44,7 @@
                     <p class="hero-kicker">Operations snapshot</p>
                     <h2>Overview</h2>
                 </div>
-                <a class="management-action" href="{% url 'themepark' %}">View User Page</a>
+                <a class="management-action" href="{% url 'themepark' %}">View Website Page</a>
             </div>
 
             <section class="staff-summary management-summary">
@@ -99,8 +99,8 @@
         {% if active_section == 'schedule' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Event scheduling and management UI</p>
-                    <h2>Schedule Management</h2>
+                    <p class="hero-kicker">Activity schedule</p>
+                    <h2>Schedules</h2>
                 </div>
             </div>
 
@@ -152,8 +152,8 @@
         {% if active_section == 'capacity' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Capacity monitoring dashboard</p>
-                    <h2>Capacity Management</h2>
+                    <p class="hero-kicker">Available spots</p>
+                    <h2>Capacity</h2>
                 </div>
             </div>
 
@@ -356,7 +356,7 @@
         {% if active_section == 'tickets' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Ticket sales CRUD dashboard</p>
+                    <p class="hero-kicker">Ticket counter</p>
                     <h2>Ticket Sales</h2>
                 </div>
             </div>
@@ -392,7 +392,7 @@
 
             <section class="staff-section in-management">
                 <div class="section-title booking-title">
-                    <p>Activity ticket sales CRUD and validation</p>
+                    <p>Activity ticket sales and checks</p>
                     <h2>Activity Ticket Records</h2>
                 </div>
                 <div class="staff-table-wrap">
@@ -440,7 +440,7 @@
 
             <section class="staff-section in-management">
                 <div class="section-title booking-title">
-                    <p>Entrance ticket sales CRUD and validation</p>
+                    <p>Entrance ticket sales and checks</p>
                     <h2>Entrance Ticket Records</h2>
                 </div>
                 <div class="staff-table-wrap">
@@ -494,7 +494,7 @@
         {% if active_section == 'validation' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">On-site ticket validation interface</p>
+                    <p class="hero-kicker">Ticket check</p>
                     <h2>Validate Tickets</h2>
                 </div>
             </div>
@@ -508,7 +508,24 @@
                     <form method="post" class="staff-form">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="validate_ticket">
-                        {{ validation_form.as_p }}
+                        {{ validation_form.non_field_errors }}
+                        <p>
+                            {{ validation_form.ticket_type.label_tag }}
+                            {{ validation_form.ticket_type }}
+                            {{ validation_form.ticket_type.errors }}
+                        </p>
+                        <div class="validation-search-grid">
+                            <p>
+                                {{ validation_form.verification_code.label_tag }}
+                                {{ validation_form.verification_code }}
+                                {{ validation_form.verification_code.errors }}
+                            </p>
+                            <p>
+                                {{ validation_form.username.label_tag }}
+                                {{ validation_form.username }}
+                                {{ validation_form.username.errors }}
+                            </p>
+                        </div>
                         <button type="submit" class="booking-submit">Check Ticket</button>
                     </form>
                 </article>
@@ -531,6 +548,43 @@
                             <p><strong>Schedule:</strong> {{ validation_result.schedule }}</p>
                             <p><strong>Channel:</strong> {{ validation_result.channel }}</p>
                             <p><strong>Purchased:</strong> {{ validation_result.purchased|date:"M d, Y H:i" }}</p>
+                        </div>
+                    {% elif validation_matches %}
+                        <div class="validation-box is-valid">
+                            <span class="soft-tag">Username search</span>
+                            <h3>Ticket Records Found</h3>
+                            <div class="staff-table-wrap mini-table-wrap">
+                                <table class="staff-table mini-staff-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Verification ID</th>
+                                            <th>Guest</th>
+                                            <th>Item</th>
+                                            <th>Quantity</th>
+                                            <th>Channel</th>
+                                            <th>Purchased</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ticket in validation_matches %}
+                                            <tr>
+                                                <td>{{ ticket.verification_code }}</td>
+                                                <td>{{ ticket.visitor.username|default:"Entrance guest" }}</td>
+                                                <td>
+                                                    {% if ticket.event %}
+                                                        {{ ticket.event.name }}
+                                                    {% else %}
+                                                        Theme Park Entrance - {{ ticket.visit_date }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ ticket.quantity }}</td>
+                                                <td>{{ ticket.get_channel_display }}</td>
+                                                <td>{{ ticket.purchased_at|date:"M d, Y H:i" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     {% elif validation_error %}
                         <div class="validation-box is-invalid">
@@ -619,7 +673,7 @@
         {% if active_section == 'reports' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Reports on ticket sales and visitors</p>
+                    <p class="hero-kicker">Ticket and visitor summary</p>
                     <h2>Reports</h2>
                 </div>
             </div>

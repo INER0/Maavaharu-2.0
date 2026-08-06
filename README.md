@@ -108,27 +108,6 @@ These accounts may exist in the local development database:
 
 If an account does not exist, create it from the Django admin or the system admin dashboard.
 
-## Database Diagram Files
-
-The project includes DBML files for database diagram tools:
-
-- `database.dbml` - generated directly from PostgreSQL
-- `maavaharu_database.dbml` - clean assignment-friendly DBML
-- `maavaharu_database_clean.dbml` - cleaned DBML copy
-- `maavaharu_db_diagram.drawio` - draw.io diagram file
-
-For DBML, use:
-
-```text
-https://dbdiagram.io/
-```
-
-For draw.io, open:
-
-```text
-maavaharu_db_diagram.drawio
-```
-
 ## API
 
 The API routes are mounted under `/api/` for:

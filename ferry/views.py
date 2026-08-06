@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -55,6 +56,7 @@ def ferry_staff_dashboard(request):
     validation_form = FerryBookingValidationForm()
     validation_result = None
     validation_error = ''
+    validation_matches = []
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -91,25 +93,36 @@ def ferry_staff_dashboard(request):
             active_section = 'validation'
             validation_form = FerryBookingValidationForm(request.POST)
             if validation_form.is_valid():
-                booking = HotelBooking.objects.select_related('visitor', 'room', 'room__hotel').filter(
-                    verification_code=validation_form.cleaned_data['verification_code']
-                ).first()
-                if booking:
-                    validation_result = {
-                        'verification_code': booking.verification_code,
-                        'guest': booking.visitor.username,
-                        'room': booking.room.room_type,
-                        'hotel': booking.room.hotel.name,
-                        'check_in': booking.check_in,
-                        'check_out': booking.check_out,
-                        'adults': booking.adults,
-                        'kids': booking.kids,
-                        'status': booking.get_status_display(),
-                        'eligible': booking.is_valid,
-                        'message': 'Eligible for ferry transfer.' if booking.is_valid else 'Not eligible for ferry transfer until booking is confirmed and active.',
-                    }
+                verification_code = validation_form.cleaned_data.get('verification_code')
+                username = validation_form.cleaned_data.get('username')
+                booking_queryset = HotelBooking.objects.select_related('visitor', 'room', 'room__hotel')
+
+                if username:
+                    validation_matches = booking_queryset.filter(
+                        Q(visitor__username__icontains=username)
+                        | Q(visitor__first_name__icontains=username)
+                        | Q(visitor__last_name__icontains=username)
+                    ).order_by('-created_at')[:20]
+                    if not validation_matches:
+                        validation_error = f'No hotel bookings found for visitor "{username}".'
                 else:
-                    validation_error = 'No hotel booking found with that verification ID.'
+                    booking = booking_queryset.filter(verification_code=verification_code).first()
+                    if booking:
+                        validation_result = {
+                            'verification_code': booking.verification_code,
+                            'guest': booking.visitor.username,
+                            'room': booking.room.room_type,
+                            'hotel': booking.room.hotel.name,
+                            'check_in': booking.check_in,
+                            'check_out': booking.check_out,
+                            'adults': booking.adults,
+                            'kids': booking.kids,
+                            'status': booking.get_status_display(),
+                            'eligible': booking.is_valid,
+                            'message': 'Eligible for ferry transfer.' if booking.is_valid else 'Not eligible for ferry transfer until booking is confirmed and active.',
+                        }
+                    else:
+                        validation_error = 'No hotel booking found with that verification ID.'
 
     total_capacity = sum(schedule.capacity for schedule in upcoming_schedules)
     total_available_seats = sum(schedule.available_seats for schedule in upcoming_schedules)
@@ -122,6 +135,7 @@ def ferry_staff_dashboard(request):
         'validation_form': validation_form,
         'validation_result': validation_result,
         'validation_error': validation_error,
+        'validation_matches': validation_matches,
         'schedules': schedules,
         'eligible_bookings': eligible_bookings,
         'upcoming_count': upcoming_schedules.count(),

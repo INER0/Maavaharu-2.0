@@ -170,6 +170,7 @@ def complete_checkout(request):
                 adults=payload['adults'],
                 kids=payload['kids'],
                 special_requests=payload['special_requests'],
+                status=HotelBooking.Status.CONFIRMED,
             )
             created_records.append({
                 'kind': 'Hotel Booking',

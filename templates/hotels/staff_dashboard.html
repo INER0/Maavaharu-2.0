@@ -4,7 +4,7 @@
 {% block title %}Hotel Staff | Maavaharu{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260802">
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260806c">
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
         </div>
         <nav>
             <a class="{% if active_section == 'overview' %}active{% endif %}" href="?section=overview">Overview</a>
-            <a class="{% if active_section == 'hotel' %}active{% endif %}" href="?section=hotel">Hotel CRUD</a>
+            <a class="{% if active_section == 'hotel' %}active{% endif %}" href="?section=hotel">Hotel Details</a>
             <a class="{% if active_section == 'rooms' %}active{% endif %}" href="?section=rooms">Rooms</a>
             <a class="{% if active_section == 'availability' %}active{% endif %}" href="?section=availability">Availability</a>
             <a class="{% if active_section == 'bookings' %}active{% endif %}" href="?section=bookings">Bookings</a>
@@ -43,7 +43,7 @@
                     <p class="hero-kicker">Operations snapshot</p>
                     <h2>Overview</h2>
                 </div>
-                <a class="management-action" href="{% url 'hotel_booking' %}">View User Page</a>
+                <a class="management-action" href="{% url 'hotel_booking' %}">View Website Page</a>
             </div>
 
             <section class="staff-summary management-summary">
@@ -77,7 +77,7 @@
                     </div>
                     <div class="report-list">
                         <p><strong>Location:</strong> {{ hotel.location|default:"Not added" }}</p>
-                        <p>{{ hotel.description|default:"Add hotel details from the Hotel CRUD section." }}</p>
+                        <p>{{ hotel.description|default:"Add hotel details from the Hotel Details section." }}</p>
                     </div>
                 </article>
                 <article class="staff-panel">
@@ -97,7 +97,7 @@
         {% if active_section == 'hotel' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Hotel CRUD management dashboard</p>
+                    <p class="hero-kicker">Hotel information</p>
                     <h2>Hotel Details</h2>
                 </div>
             </div>
@@ -134,8 +134,8 @@
         {% if active_section == 'rooms' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Room availability and CRUD</p>
-                    <h2>Room Management</h2>
+                    <p class="hero-kicker">Room setup</p>
+                    <h2>Rooms</h2>
                 </div>
             </div>
 
@@ -169,11 +169,32 @@
             <section class="staff-section in-management">
                 <div class="section-title booking-title">
                     <p>Current room types</p>
-                    <h2>Room CRUD Dashboard</h2>
+                    <h2>Room List</h2>
                 </div>
 
+                <form method="get" class="staff-panel room-filter-form">
+                    <input type="hidden" name="section" value="rooms">
+                    <p>
+                        <label for="room_search">Search room</label>
+                        <input id="room_search" type="search" name="room_search" value="{{ room_search }}" placeholder="Room name">
+                    </p>
+                    <p>
+                        <label for="room_hotel">Filter by hotel</label>
+                        <select id="room_hotel" name="room_hotel">
+                            <option value="">All hotels</option>
+                            {% for hotel_option in hotels %}
+                                <option value="{{ hotel_option.id }}" {% if room_hotel_filter == hotel_option.id|stringformat:"s" %}selected{% endif %}>{{ hotel_option.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <div class="filter-actions">
+                        <button type="submit" class="booking-submit">Search</button>
+                        <a href="?section=rooms">Clear</a>
+                    </div>
+                </form>
+
                 <div class="staff-card-grid room-management-grid">
-                    {% for room in rooms %}
+                    {% for room in room_list %}
                         <article class="staff-card">
                             <p class="staff-preview-label">Room record</p>
                             <div class="staff-site-preview">
@@ -231,8 +252,8 @@
                         </article>
                     {% empty %}
                         <article class="staff-card">
-                            <h3>No rooms added yet</h3>
-                            <p>Add room types using the room availability form.</p>
+                            <h3>No matching rooms found</h3>
+                            <p>Try another room name or hotel filter.</p>
                         </article>
                     {% endfor %}
                 </div>
@@ -297,7 +318,7 @@
         {% if active_section == 'bookings' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Booking management interface</p>
+                    <p class="hero-kicker">Booking desk</p>
                     <h2>Visitor Bookings</h2>
                 </div>
             </div>
@@ -357,8 +378,8 @@
         {% if active_section == 'promotions' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Promotions and advertisement input forms</p>
-                    <h2>Promotion Management</h2>
+                    <p class="hero-kicker">Hotel offers</p>
+                    <h2>Promotions</h2>
                 </div>
             </div>
 

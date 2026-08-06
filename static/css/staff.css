@@ -447,6 +447,12 @@
     padding: 16px;
 }
 
+.validation-search-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .validation-box h3 {
     color: #173f4a;
     margin: 0 0 10px;
@@ -458,6 +464,20 @@
 
 .is-invalid {
     border-color: #d8a29e;
+}
+
+.mini-table-wrap {
+    margin-top: 12px;
+}
+
+.mini-staff-table {
+    min-width: 680px;
+}
+
+.mini-staff-table th,
+.mini-staff-table td {
+    font-size: 13px;
+    padding: 10px;
 }
 
 .capacity-grid {
@@ -694,6 +714,56 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.room-filter-form {
+    align-items: end;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto;
+    margin-bottom: 18px;
+}
+
+.room-filter-form p {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.room-filter-form label {
+    color: #24404a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.room-filter-form input,
+.room-filter-form select {
+    background: #ffffff;
+    border: 1px solid #cfe7e4;
+    border-radius: 6px;
+    color: #24404a;
+    font: inherit;
+    min-height: 42px;
+    padding: 9px 12px;
+    width: 100%;
+}
+
+.filter-actions {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-actions .booking-submit {
+    min-width: 110px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.filter-actions a {
+    color: #0b7183;
+    font-weight: 800;
+    text-decoration: none;
+}
+
 .room-edit-form {
     border-top: 1px solid #d8e7e7;
     margin-top: 14px;
@@ -752,7 +822,8 @@
     }
 
     .availability-filter-form,
-    .availability-room-heading {
+    .availability-room-heading,
+    .room-filter-form {
         display: grid;
         grid-template-columns: 1fr;
     }
@@ -765,6 +836,10 @@
     }
 
     .inline-status-form {
+        grid-template-columns: 1fr;
+    }
+
+    .validation-search-grid {
         grid-template-columns: 1fr;
     }
 }

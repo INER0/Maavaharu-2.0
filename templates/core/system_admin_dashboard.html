@@ -4,7 +4,7 @@
 {% block title %}System Admin | Maavaharu{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260802">
+    <link rel="stylesheet" href="{% static 'css/staff.css' %}?v=20260806b">
 {% endblock %}
 
 {% block content %}
@@ -97,7 +97,7 @@
         {% if active_section == 'users' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">User management interface</p>
+                    <p class="hero-kicker">Accounts and access</p>
                     <h2>Accounts And Permissions</h2>
                 </div>
             </div>
@@ -122,10 +122,10 @@
                     </div>
                     <div class="report-list">
                         <p><strong>Visitor:</strong> can book hotel rooms and theme park tickets.</p>
-                        <p><strong>Hotel Manager:</strong> goes to hotel staff dashboard.</p>
-                        <p><strong>Ferry Operator:</strong> goes to ferry staff dashboard.</p>
-                        <p><strong>Theme Park Staff:</strong> goes to theme park staff dashboard.</p>
-                        <p><strong>Admin:</strong> goes to this system admin dashboard.</p>
+                        <p><strong>Hotel Manager:</strong> can manage hotel rooms, bookings, and offers.</p>
+                        <p><strong>Ferry Operator:</strong> can manage ferry schedules and boarding checks.</p>
+                        <p><strong>Theme Park Staff:</strong> can manage activities, tickets, and visitor entry.</p>
+                        <p><strong>Admin:</strong> can manage users, ads, map content, reports, and issues.</p>
                     </div>
                 </article>
             </section>
@@ -191,7 +191,7 @@
         {% if active_section == 'content' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">Content management system</p>
+                    <p class="hero-kicker">Homepage content</p>
                     <h2>Homepage Advertisements</h2>
                 </div>
                 <a class="management-action" href="{% url 'home' %}">View Homepage</a>
@@ -413,7 +413,7 @@
         {% if active_section == 'reports' %}
             <div class="management-heading">
                 <div>
-                    <p class="hero-kicker">System reports and analytics</p>
+                    <p class="hero-kicker">System summary</p>
                     <h2>Usage And Sales</h2>
                 </div>
             </div>

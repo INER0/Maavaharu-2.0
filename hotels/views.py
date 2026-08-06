@@ -125,6 +125,14 @@ def hotel_staff_dashboard(request):
 
     hotel = Hotel.objects.first()
     rooms = Room.objects.select_related('hotel').prefetch_related('images').order_by('room_type')
+    room_search = request.GET.get('room_search', '').strip()
+    room_hotel_filter = request.GET.get('room_hotel', '').strip()
+    room_list = rooms
+    if room_search:
+        room_list = room_list.filter(room_type__icontains=room_search)
+    if room_hotel_filter:
+        room_list = room_list.filter(hotel_id=room_hotel_filter)
+    hotels = Hotel.objects.order_by('name')
     bookings = HotelBooking.objects.select_related('visitor', 'room', 'room__hotel').order_by('-created_at')
     promotions = HotelPromotion.objects.select_related('hotel').prefetch_related('images').order_by('valid_until')
 
@@ -279,6 +287,10 @@ def hotel_staff_dashboard(request):
     return render(request, 'hotels/staff_dashboard.html', {
         'hotel': hotel,
         'rooms': rooms,
+        'room_list': room_list,
+        'hotels': hotels,
+        'room_search': room_search,
+        'room_hotel_filter': room_hotel_filter,
         'bookings': bookings,
         'promotions': promotions,
         'hotel_form': hotel_form,
